@@ -12,7 +12,7 @@ var options = {
   index: "index.html"
 };
 
-app.use('/', express.static('./pub_html', options));
+app.use('/', express.static('./public', options));
 
 app.listen(port);
 console.log('running on port',port);
