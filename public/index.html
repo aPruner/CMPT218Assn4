@@ -14,8 +14,8 @@
     <div>
       <div class="container page-container">
         <h1 class="is-size-1">Welcome to 3D Tic-Tac-Toe online!</h1>
-        <a v-on:click="" class="button is-primary is-large">Log in</a>
-        <a class="button is-primary is-large">Sign Up</a>
+        <a class="button is-primary is-large" v-on:click="switchToLogin">Log in</a>
+        <a class="button is-primary is-large" v-on:click="switchToSignup">Sign Up</a>
       </div>
     </div>
   </section>
@@ -37,6 +37,7 @@
           </div>
         </div>
         <a class="button is-primary is-large">Log in</a>
+        <a class="button is-primary is-large" v-on:click="switchToLanding">Back</a>
       </div>
     </div>
   </section>
@@ -100,6 +101,7 @@
           </div>
         </div>
         <a class="button is-primary is-large">Submit</a>
+        <a class="button is-primary is-large" v-on:click="switchToLanding">Back</a>
       </div>
     </div>
   </section>

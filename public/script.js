@@ -16,10 +16,19 @@ var app = new Vue({
       password: '',
       passwordConfirm: ''
     },
-    page: 'signup'
+    page: 'landing'
   },
   methods: {
-    // methods here
-
+    switchToLogin: function() {
+      app.page = 'login';
+    },
+    switchToSignup: function() {
+      app.page = 'signup'
+    },
+    switchToLanding: function() {
+      app.page = 'landing'
+    }
   }
+
+
 });
