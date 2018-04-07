@@ -1,0 +1,11 @@
+{
+  "name": "218a4",
+  "version": "1.0.0",
+  "description": "3d tic-tac-toe game for 218a4",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Pruner & Vladimir Bereznyakov",
+  "license": "ISC"
+}
