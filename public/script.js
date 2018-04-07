@@ -1,9 +1,10 @@
 var app = new Vue({
   el: '#app',
   data: {
-    show: 'login'
+    // app state
+    show: 'landing'
   },
   methods: {
-    //methods here
+    // methods here
   }
 });
