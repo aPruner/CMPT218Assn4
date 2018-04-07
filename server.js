@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 var passport = require('passport')
     , LocalStrategy = require('passport-local').Strategy;
 
