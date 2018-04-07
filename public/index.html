@@ -14,7 +14,7 @@
     <div>
       <div class="container page-container">
         <h1 class="is-size-1">Welcome to 3D Tic-Tac-Toe online!</h1>
-        <a class="button is-primary is-large">Log in</a>
+        <a v-on:click="" class="button is-primary is-large">Log in</a>
         <a class="button is-primary is-large">Sign Up</a>
       </div>
     </div>
@@ -23,7 +23,19 @@
   <section v-else-if="page === 'login'">
     <div>
       <div class="container page-container">
-        <h1 class="is-size-1">Log in</h1>
+        <h1 class="is-size-2">Log in</h1>
+        <div class="field">
+          <label class="label">Username</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="e.g. TheLegend27">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control">
+            <input class="input" type="password">
+          </div>
+        </div>
         <a class="button is-primary is-large">Log in</a>
       </div>
     </div>
@@ -32,10 +44,66 @@
   <section v-else-if="page === 'signup'">
     <div>
       <div class="container page-container">
-        <h1 class="is-size-1">Sign up</h1>
+        <h1 class="is-size-2">Sign up</h1>
+        <div class="field">
+          <label class="label">First Name</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="e.g. Jane" v-model="signUpInfo.firstName">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Last Name</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="e.g. Doe" v-model="signUpInfo.lastName">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Username</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="e.g. TheLegend27" v-model="signUpInfo.username">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Age</label>
+          <div class="control">
+            <input class="input" type="number" placeholder="e.g. 19" v-model="signUpInfo.age">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Gender</label>
+          <div class="control">
+            <div class="select">
+              <select v-model="signUpInfo.gender">
+                <option>Male</option>
+                <option>Female</option>
+                <option>Non-Binary</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">E-mail</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="e.g. thelegend27@abcdef.com" v-model="signUpInfo.email">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <div class="control">
+            <input class="input" type="password" placeholder="must be at least 8 characters" v-model="signUpInfo.password">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Confirm Password</label>
+          <div class="control">
+            <input class="input" type="password" placeholder="type it again!" v-model="signUpInfo.passwordConfirm">
+          </div>
+        </div>
+        <a class="button is-primary is-large">Submit</a>
       </div>
     </div>
   </section>
 </div>
+<script src="script.js"></script>
 </body>
 </html>

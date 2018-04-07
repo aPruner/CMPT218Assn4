@@ -7,12 +7,19 @@ var app = new Vue({
       password: ''
     },
     signUpInfo: {
+      firstName: '',
+      lastName: '',
+      age: 0,
+      email: '',
+      gender: '',
       username: '',
-      password: ''
+      password: '',
+      passwordConfirm: ''
     },
-    page: 'landing'
+    page: 'signup'
   },
   methods: {
     // methods here
+
   }
 });
