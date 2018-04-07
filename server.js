@@ -19,13 +19,13 @@ passport.use(new LocalStrategy(
   function(username, password, done) {
     uModel.findOne({uname: username}, function (err, user){
       if (err) { return done(err); }
-      //Incorrect user name
+      //Incorrect username
       if (!user) {
-        return done(null, false);
+        return done(null, false, { message: 'Incorrect username.' });
       }
       //Incorrect password
       if (!user.verifyPassword(password)) {
-        return done(null, false);
+        return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null,user);
     });
@@ -45,6 +45,7 @@ var Schema = mongoose.Schema;
 
 var User = new Schema ({
   uname: String,
+  pass: String,
   lname: String,
   fname: String,
   age: Number,
@@ -56,6 +57,12 @@ var User = new Schema ({
 
 //create model
 var uModel = mongoose.model('uModel', User);
+
+//setup passport for use
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', express.static('./public', options));
 
