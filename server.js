@@ -20,18 +20,22 @@ db.once('open', function(){
   console.log('connection success');
 });
 
-//create Schema
-// var Schema = mongoose.Schema;
-//
-// var checkString = new Schema ({
-//   name: String,
-//   open: Boolean,
-//   date: { type: Date, default: Date.now },
-//   users: [{ studName: String, studNum: Number }]
-// });
-//
-// //create model
-// var CheckIn = mongoose.model('CheckIn', checkString);
+// create Schema
+var Schema = mongoose.Schema;
+
+var User = new Schema ({
+  uname: String,
+  lname: String,
+  fname: String,
+  age: Number,
+  gender: Boolean,//not sure yet
+  email: String,
+  wins: Number,
+  losses: Number
+});
+
+//create model
+var uModel = mongoose.model('uModel', User);
 
 app.use('/', express.static('./public', options));
 
