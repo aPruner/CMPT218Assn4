@@ -18,22 +18,37 @@ var options = {
 };
 
 //setup passport strategy
-passport.use(new LocalStrategy(
+passport.use(new LocalStrategy({
+    usernameField: 'userName',
+    passwordField: 'password'
+  },
   function(username, password, done) {
     uModel.findOne({userName: username}, function (err, user){
       if (err) { return done(err); }
       //Incorrect username
       if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(null, false);
       }
       //Incorrect password
-      if (!user.verifyPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
+      //bcrypt.compareSync(myPlaintextPassword, hash)
+      if (!bcrypt.compareSync(password, user.password)) {
+        return done(null, false);
       }
+      //both userName and passWord correct
       return done(null,user);
     });
   }
 ));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
 
 //setup mongoose connection
 mongoose.connect("mongodb://assignment4:assignment4@ds123399.mlab.com:23399/a3db");
@@ -105,6 +120,12 @@ app.post('/register', function(req,res){
     if(err) throw(err);
     res.send('User Registered');//temporary response to see if creation works as intended, change later
   });
+});
+
+//authenticate login request
+app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
+  console.log('entered /login');
+  res.send('change this later');
 });
 
 app.listen(port);
