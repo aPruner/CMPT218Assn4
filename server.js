@@ -30,7 +30,6 @@ passport.use(new LocalStrategy({
         return done(null, false);
       }
       //Incorrect password
-      //bcrypt.compareSync(myPlaintextPassword, hash)
       if (!bcrypt.compareSync(password, user.password)) {
         return done(null, false);
       }
@@ -123,9 +122,15 @@ app.post('/register', function(req,res){
 });
 
 //authenticate login request
-app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
+app.post('/login', passport.authenticate('local', { failureRedirect: '/failed'}), function(req, res) {
   console.log('entered /login');
   res.send('logged in');
+});
+
+//inform user of failed login and try again
+app.get('/failed', function(req,res){
+  console.log('entered /failed');
+  res.send('Invalid Credentials, try again');
 });
 
 //logout user
@@ -135,5 +140,6 @@ app.post('/logout', function(req, res){
   res.send('logged out');
 });
 
+//run server
 app.listen(port);
 console.log('running on port',port);

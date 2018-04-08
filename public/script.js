@@ -65,9 +65,14 @@ var app = new Vue({
           password: app.loginInfo.password
         },
         success: function(data) {
-          alert(data); //temporary to prevent errors
-          app.page = 'home';
-          app.currentUserData.userName = app.loginInfo.userName;
+          console.log(data);
+          if(data === 'logged in') {
+            alert(data); //temporary to prevent errors
+            app.page = 'home';
+            app.currentUserData.userName = app.loginInfo.userName;
+          }else{
+            alert(data);
+          }
         }
       });
     },
