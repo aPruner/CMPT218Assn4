@@ -67,5 +67,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', express.static('./public', options));
 
+
+
 app.listen(port);
 console.log('running on port',port);

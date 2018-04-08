@@ -27,6 +27,24 @@ var app = new Vue({
     },
     switchToLanding: function() {
       app.page = 'landing'
+    },
+    submitSignup: function() {
+      $.ajax({
+        method: 'post',
+        url: '/signup',
+        data: {
+          firstName: app.signUpInfo.firstName,
+          lastName: app.signUpInfo.lastName,
+          age: app.signUpInfo.age,
+          email: app.signUpInfo.email,
+          gender: app.signUpInfo.gender,
+          username: app.signUpInfo.username,
+          password: app.signUpInfo.password
+        },
+        success: function(data) {
+          alert(data);
+        }
+      });
     }
   }
 

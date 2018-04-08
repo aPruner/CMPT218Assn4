@@ -100,7 +100,7 @@
             <input class="input" type="password" placeholder="type it again!" v-model="signUpInfo.passwordConfirm">
           </div>
         </div>
-        <a class="button is-primary is-large">Submit</a>
+        <a class="button is-primary is-large" v-on:click="submitSignup">Submit</a>
         <a class="button is-primary is-large" v-on:click="switchToLanding">Back</a>
       </div>
     </div>
