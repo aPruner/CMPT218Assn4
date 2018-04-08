@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.css">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 <div id="app">
@@ -194,7 +193,8 @@
           <h1 class="is-size-5">Losses: {{ currentUserData.losses }}</h1>
           </br>
           <a class="button is-primary is-large" v-on:click="logoutUser">Log out</a>
-          <a class="button is-primary is-large" v-on:click="createNewGame">Find match</a>
+          <a class="button is-primary is-large" v-on:click="createNewGame">Create match</a>
+          <a class="button is-primary is-large" v-on:click="joinGame">Join match</a>
         </div>
       </div>
     </div>

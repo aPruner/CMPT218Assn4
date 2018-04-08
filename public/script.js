@@ -1,4 +1,6 @@
 var io = require('socket.io-client');
+var p1 = 'X', p2 = 'O';
+var socket = io.connect('http://localhost:3000'), player, game;
 
 var app = new Vue({
   el: '#app',
@@ -93,10 +95,25 @@ var app = new Vue({
     },
     createNewGame: function() {
       console.log('inside createNewGame');
-      var p1 = 'X', p2 = 'O';
-      var socket = io.connect('http://localhost:3000'), player, game;
-      socket.emit('createGame', {userName: app.currentUserData.userName});
+      socket.emit('createGame', {name: app.currentUserData.userName});
+      // player = new Player(app.currentUserData.userName, p1);
       console.log('createGame emitted to server side');
+    },
+    joinGame: function() {
+      console.log('inside joinGame');
+      $.ajax({
+        method: 'get',
+        url: '/rooms',
+        success: function(roomId) {
+          console.log('room received, it is:', roomId);
+          socket.emit('joinGame', {
+            name: app.currentUserData.userName,
+            room: roomId
+          });
+          // player = new Player(app.currentUserData.userName, p2);
+          console.log('joinGame emitted to server side');
+        }
+      });
     }
   }
 });

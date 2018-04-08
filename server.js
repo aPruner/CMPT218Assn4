@@ -10,6 +10,8 @@ var io = require('socket.io')(server);
 
 var saltRounds = 10;
 
+var rooms = 0;
+
 var port = process.env.PORT || 3000;
 
 var options = {
@@ -142,6 +144,12 @@ app.post('/logout', function(req, res){
   res.send('logged out');
 });
 
+//sends the latest created room to the user
+app.get('/rooms', function(req, res) {
+  console.log('entered /rooms');
+  res.send('room-' + rooms);
+});
+
 io.on('connection', function(socket) {
   // Reference: https://ayushgp.github.io/Tic-Tac-Toe-Socket-IO/
 
@@ -150,8 +158,10 @@ io.on('connection', function(socket) {
    */
   socket.on('createGame', function(data){
     console.log('entered createGame event handler');
-    socket.join('room-1');
-    socket.emit('newGame', {name: data.name});
+    rooms++;
+    var roomId = 'rooms-' + rooms;
+    socket.join(roomId);
+    socket.emit('newGame', {name: data.name, room: roomId});
   });
 
   /**
