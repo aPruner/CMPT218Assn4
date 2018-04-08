@@ -125,14 +125,14 @@ app.post('/register', function(req,res){
 //authenticate login request
 app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
   console.log('entered /login');
-  res.send('change this later');
+  res.send('logged in');
 });
 
 //logout user
-app.get('/logout', function(req, res){
+app.post('/logout', function(req, res){
   console.log('entered /logout');
   req.logout();
-  res.send(req.user,' is logged out');
+  res.send('logged out');
 });
 
 app.listen(port);

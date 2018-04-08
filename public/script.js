@@ -77,6 +77,7 @@ var app = new Vue({
         success: function (data) {
           alert(data); //temporary to prevent errors
           app.page = 'home';
+          app.currentUserData.userName = app.loginInfo.userName;
         }
       });
     },
