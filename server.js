@@ -6,6 +6,8 @@ var bcrypt = require('bcrypt');
 var passport = require('passport')
     , LocalStrategy = require('passport-local').Strategy;
 
+var saltRounds = 10;
+
 var port = process.env.PORT || 3000;
 
 var options = {
@@ -18,7 +20,7 @@ var options = {
 //setup passport strategy
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    uModel.findOne({uname: username}, function (err, user){
+    uModel.findOne({userName: username}, function (err, user){
       if (err) { return done(err); }
       //Incorrect username
       if (!user) {
@@ -59,6 +61,23 @@ var User = new Schema ({
 //create model
 var uModel = mongoose.model('uModel', User);
 
+//pre hook to bcrypt password
+User.pre('save', function(next){
+  var user = this;
+  if (!user.isModified('password')) return next();
+
+  bcrypt.genSalt(saltRounds, function(err, salt){
+    if(err) return next(err);
+
+    bcrypt.hash(user.password, salt, function(err, hash){
+      if(err) return next(err);
+
+      user.password = hash;
+      next();
+    });
+  });
+});
+
 //setup passport for use
 app.use(passport.initialize());
 app.use(passport.session());
@@ -71,9 +90,9 @@ app.use('/', express.static('./public', options));
 app.post('/register', function(req,res){
   console.log('entered /register');
 
-  uModel.create({
+  var newUser = new uModel({
     'userName':req.body.userName,
-    'password':req.body.password, //change to bcrypted password next
+    'password':req.body.password,
     'lastName':req.body.lastName,
     'firstName':req.body.firstName,
     'age': req.body.age,
@@ -81,7 +100,8 @@ app.post('/register', function(req,res){
     'email': req.body.email,
     'wins': 0,
     'losses': 0
-  }, function(err){
+  });
+  newUser.save(function(err){
     if(err) throw(err);
     res.send('User Registered');//temporary response to see if creation works as intended, change later
   });
