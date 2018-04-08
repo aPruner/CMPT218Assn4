@@ -1,3 +1,5 @@
+var io = require('socket.io-client');
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -90,9 +92,11 @@ var app = new Vue({
       });
     },
     createNewGame: function() {
+      console.log('inside createNewGame');
       var p1 = 'X', p2 = 'O';
       var socket = io.connect('http://localhost:3000'), player, game;
       socket.emit('createGame', {userName: app.currentUserData.userName});
+      console.log('createGame emitted to server side');
     }
   }
 });
