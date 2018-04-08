@@ -21,9 +21,10 @@ var app = new Vue({
       passwordConfirm: ''
     },
     currentUserData: {
-      userName: 'vberezny',
+      userName: '',
       wins: 0,
-      losses: 0
+      losses: 0,
+      totalGames: 0
     },
     page: 'landing'
   },
@@ -54,6 +55,7 @@ var app = new Vue({
           },
           success: function (data) {
             alert(data); //temporary to prevent errors
+            app.page = 'landing';
           }
         });
       } else {
@@ -69,11 +71,30 @@ var app = new Vue({
           password: app.loginInfo.password
         },
         success: function(data) {
-          console.log(data);
           if(data === 'logged in') {
-            alert(data); //temporary to prevent errors
             app.page = 'home';
             app.currentUserData.userName = app.loginInfo.userName;
+            app.loginInfo.password = ''; //clear password after login
+            $.ajax({
+              method: 'post',
+              url: '/retrieveStats',
+              data: {
+                userName: app.currentUserData.userName
+              },
+              success: function(data) {
+                var wins = 0;
+                var losses = 0;
+                var games = 0;
+                $.each(JSON.parse(data), function(i, item){
+                  wins = item.wins;
+                  losses = item.losses;
+                  games = wins + losses;
+                });
+                app.currentUserData.wins = wins;
+                app.currentUserData.losses = losses;
+                app.currentUserData.totalGames = games;
+              }
+            });
           }else{
             alert(data);
           }
@@ -89,6 +110,10 @@ var app = new Vue({
         },
         success: function (data) {
           alert(data); //temporary to prevent errors
+          app.currentUserData.userName = '';
+          app.currentUserData.losses = 0;
+          app.currentUserData.wins = 0;
+          app.currentUserData.totalGames = 0;
           app.page = 'landing';
         }
       });

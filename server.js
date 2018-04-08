@@ -72,8 +72,7 @@ var User = new Schema ({
   age: Number,
   gender: String,
   email: String,
-  wins: Number,
-  losses: Number
+  gameStats: [{ wins: Number, losses: Number }]
 });
 
 //create model
@@ -108,6 +107,8 @@ app.use('/', express.static('./public', options));
 app.post('/register', function(req,res){
   console.log('entered /register');
 
+  var stats = {wins:0,losses:0};
+
   var newUser = new uModel({
     'userName':req.body.userName,
     'password':req.body.password,
@@ -115,10 +116,9 @@ app.post('/register', function(req,res){
     'firstName':req.body.firstName,
     'age': req.body.age,
     'gender': req.body.gender,
-    'email': req.body.email,
-    'wins': 0,
-    'losses': 0
+    'email': req.body.email
   });
+  newUser.gameStats.push(stats);
   newUser.save(function(err){
     if(err) throw(err);
     res.send('User Registered');//temporary response to see if creation works as intended, change later
@@ -135,6 +135,18 @@ app.post('/login', passport.authenticate('local', { failureRedirect: '/failed'})
 app.get('/failed', function(req,res){
   console.log('entered /failed');
   res.send('Invalid Credentials, try again');
+});
+
+//retrieve user statistics
+app.post('/retrieveStats', function(req,res){
+  console.log('entered /retrieveStats');
+
+  uModel.findOne({'userName': req.body.userName}, function(err, obj){
+    if(err) throw (err);
+    console.log(obj.userName);
+    console.log(JSON.stringify(obj.gameStats));
+    res.send(JSON.stringify(obj.gameStats));
+  });
 });
 
 //logout user
