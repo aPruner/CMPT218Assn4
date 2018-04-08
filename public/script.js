@@ -84,10 +84,10 @@ var app = new Vue({
         }
       });
     },
-    startMatchmaking: function() {
-      // $.ajax({
-      //
-      // })
+    createNewGame: function() {
+      var p1 = 'X', p2 = 'O';
+      var socket = io.connect('http://localhost:3000'), player, game;
+      socket.emit('createGame', {userName: app.currentUserData.userName});
     }
   }
 });
