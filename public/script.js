@@ -32,16 +32,6 @@ var app = new Vue({
     },
     switchToLanding: function() {
       app.page = 'landing';
-      $.ajax({
-        method: 'post',
-        url: '/logout',
-        data: {
-          user: app.currentUserData.userName
-        },
-        success: function (data) {
-          alert(data); //temporary to prevent errors
-        }
-      });
     },
     registerUser: function() {
       //TODO: add checks for all other variables being filled in (or input validation on front end)
@@ -74,10 +64,23 @@ var app = new Vue({
           userName: app.loginInfo.userName,
           password: app.loginInfo.password
         },
-        success: function (data) {
+        success: function(data) {
           alert(data); //temporary to prevent errors
           app.page = 'home';
           app.currentUserData.userName = app.loginInfo.userName;
+        }
+      });
+    },
+    logoutUser: function() {
+      $.ajax({
+        method: 'post',
+        url: '/logout',
+        data: {
+          user: app.currentUserData.userName
+        },
+        success: function (data) {
+          alert(data); //temporary to prevent errors
+          app.page = 'landing';
         }
       });
     },
