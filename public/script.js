@@ -3,7 +3,7 @@ var app = new Vue({
   data: {
     // app state
     loginInfo: {
-      username: '',
+      userName: '',
       password: ''
     },
     signUpInfo: {
@@ -12,7 +12,7 @@ var app = new Vue({
       age: 0,
       email: '',
       gender: '',
-      username: '',
+      userName: '',
       password: '',
       passwordConfirm: ''
     },
@@ -28,6 +28,7 @@ var app = new Vue({
     switchToLanding: function() {
       app.page = 'landing'
     },
+<<<<<<< HEAD
     submitSignup: function() {
       $.ajax({
         method: 'post',
@@ -45,6 +46,30 @@ var app = new Vue({
           alert(data);
         }
       });
+=======
+    registerUser: function() {
+      //TODO: add checks for all other variables being filled in
+      if(app.signUpInfo.password === app.signUpInfo.passwordConfirm) {
+        $.ajax({
+          method: 'post',
+          url: '/register',
+          data: {
+            firstName: app.signUpInfo.firstName,
+            lastName: app.signUpInfo.lastName,
+            age: app.signUpInfo.age,
+            email: app.signUpInfo.email,
+            gender: app.signUpInfo.gender,
+            userName: app.signUpInfo.userName,
+            password: app.signUpInfo.password
+          },
+          success: function (data) {
+            alert(data); //temporary to prevent errors
+          }
+        });
+      }else{
+        alert('passwords do not match');
+      }
+>>>>>>> a5692a4c6bde575ed0e5ff1e3eb98bac034c6b12
     }
   }
 

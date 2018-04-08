@@ -27,7 +27,7 @@
         <div class="field">
           <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" placeholder="e.g. TheLegend27" v-model="loginInfo.username">
+            <input class="input" type="text" placeholder="e.g. TheLegend27" v-model="loginInfo.userName">
           </div>
         </div>
         <div class="field">
@@ -61,7 +61,7 @@
         <div class="field">
           <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" placeholder="e.g. TheLegend27" v-model="signUpInfo.username">
+            <input class="input" type="text" placeholder="e.g. TheLegend27" v-model="signUpInfo.userName">
           </div>
         </div>
         <div class="field">
@@ -100,7 +100,7 @@
             <input class="input" type="password" placeholder="type it again!" v-model="signUpInfo.passwordConfirm">
           </div>
         </div>
-        <a class="button is-primary is-large" v-on:click="submitSignup">Submit</a>
+        <a class="button is-primary is-large" v-on:click="registerUser">Submit</a>
         <a class="button is-primary is-large" v-on:click="switchToLanding">Back</a>
       </div>
     </div>

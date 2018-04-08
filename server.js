@@ -45,12 +45,12 @@ db.once('open', function(){
 var Schema = mongoose.Schema;
 
 var User = new Schema ({
-  uname: String,
-  pass: String,
-  lname: String,
-  fname: String,
+  userName: String,
+  password: String,
+  lastName: String,
+  firstName: String,
   age: Number,
-  gender: Boolean,//not sure yet
+  gender: String,
   email: String,
   wins: Number,
   losses: Number
@@ -67,7 +67,29 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', express.static('./public', options));
 
+<<<<<<< HEAD
 
+=======
+// register user
+app.post('/register', function(req,res){
+  console.log('entered /register');
+
+  uModel.create({
+    'userName':req.body.userName,
+    'password':req.body.password, //change to bcrypted password next
+    'lastName':req.body.lastName,
+    'firstName':req.body.firstName,
+    'age': req.body.age,
+    'gender': req.body.gender,
+    'email': req.body.email,
+    'wins': 0,
+    'losses': 0
+  }, function(err){
+    if(err) throw(err);
+    res.send('User Registered');//temporary response to see if creation works as intended, change later
+  });
+});
+>>>>>>> a5692a4c6bde575ed0e5ff1e3eb98bac034c6b12
 
 app.listen(port);
 console.log('running on port',port);
