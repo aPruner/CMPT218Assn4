@@ -23,7 +23,7 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
   },
   function(username, password, done) {
-    uModel.findOne({userName: username}, function (err, user){
+    uModel.findOne({userName: username}, function (err, user) {
       if (err) { return done(err); }
       //Incorrect username
       if (!user) {
