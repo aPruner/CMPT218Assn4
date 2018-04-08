@@ -32,7 +32,6 @@ passport.use(new LocalStrategy({
         return done(null, false);
       }
       //Incorrect password
-      //bcrypt.compareSync(myPlaintextPassword, hash)
       if (!bcrypt.compareSync(password, user.password)) {
         return done(null, false);
       }
@@ -125,9 +124,15 @@ app.post('/register', function(req,res){
 });
 
 //authenticate login request
-app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
+app.post('/login', passport.authenticate('local', { failureRedirect: '/failed'}), function(req, res) {
   console.log('entered /login');
   res.send('logged in');
+});
+
+//inform user of failed login and try again
+app.get('/failed', function(req,res){
+  console.log('entered /failed');
+  res.send('Invalid Credentials, try again');
 });
 
 //logout user
@@ -144,8 +149,9 @@ io.on('connection', function(socket) {
    * Create a new game room and notify the creator of game.
    */
   socket.on('createGame', function(data){
-    socket.join('room-' + ++rooms);
-    socket.emit('newGame', {name: data.name, room: 'room-'+rooms});
+    console.log('entered createGame event handler');
+    socket.join('room-1');
+    socket.emit('newGame', {name: data.name});
   });
 
   /**
@@ -153,7 +159,7 @@ io.on('connection', function(socket) {
    */
   socket.on('joinGame', function(data){
     var room = io.nsps['/'].adapter.rooms[data.room];
-    if(room && room.length == 1){
+    if(room && room.length === 1){
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('player1', {});
       socket.emit('player2', {name: data.name, room: data.room })
