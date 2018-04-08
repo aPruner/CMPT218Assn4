@@ -28,25 +28,6 @@ var app = new Vue({
     switchToLanding: function() {
       app.page = 'landing'
     },
-<<<<<<< HEAD
-    submitSignup: function() {
-      $.ajax({
-        method: 'post',
-        url: '/signup',
-        data: {
-          firstName: app.signUpInfo.firstName,
-          lastName: app.signUpInfo.lastName,
-          age: app.signUpInfo.age,
-          email: app.signUpInfo.email,
-          gender: app.signUpInfo.gender,
-          username: app.signUpInfo.username,
-          password: app.signUpInfo.password
-        },
-        success: function(data) {
-          alert(data);
-        }
-      });
-=======
     registerUser: function() {
       //TODO: add checks for all other variables being filled in
       if(app.signUpInfo.password === app.signUpInfo.passwordConfirm) {
@@ -66,10 +47,9 @@ var app = new Vue({
             alert(data); //temporary to prevent errors
           }
         });
-      }else{
+      } else {
         alert('passwords do not match');
       }
->>>>>>> a5692a4c6bde575ed0e5ff1e3eb98bac034c6b12
     }
   }
 
