@@ -21,7 +21,7 @@ var app = new Vue({
       wins: 0,
       losses: 0
     },
-    page: 'home'
+    page: 'landing'
   },
   methods: {
     switchToLogin: function() {
@@ -66,8 +66,14 @@ var app = new Vue({
         },
         success: function (data) {
           alert(data); //temporary to prevent errors
+          app.page = 'home';
         }
       });
+    },
+    startMatchmaking: function() {
+      // $.ajax({
+      //
+      // })
     }
   }
 });
