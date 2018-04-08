@@ -105,6 +105,92 @@
       </div>
     </div>
   </section>
+
+  <section v-else-if="page === 'game'">
+    <div>
+      <div class="container game-page-container">
+        <div class="box game">
+          <div class="box game-board-container">
+
+            <div class="top-board-container">
+              <h1 class="is-size-5 top-board-label">Top board</h1>
+              <div class="game-board">
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="middle-board-container">
+              <h1 class="is-size-5 middle-board-label">Middle board</h1>
+              <div class="game-board">
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-board-container">
+              <h1 class="is-size-5 bottom-board-label">Bottom board</h1>
+              <div class="game-board bottom-board">
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+                <div class="game-cell-row">
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                  <div class="game-cell"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box game-ui-container">
+            <h1 class="is-size-3">This is the game UI, other information related to the game (whose turn it is, etc) goes here for both players to view.</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section v-else-if="page === 'home'">
+    <div>
+      <div class="container page-container">
+        <h1 class="is-size-2">Welcome, {{ currentUserName }}</h1>
+        <a class="button is-primary is-large" v-on:click="switchToLanding">Log out</a>
+      </div>
+    </div>
+  </section>
 </div>
 <script src="script.js"></script>
 </body>

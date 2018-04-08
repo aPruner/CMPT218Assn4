@@ -16,7 +16,8 @@ var app = new Vue({
       password: '',
       passwordConfirm: ''
     },
-    page: 'landing'
+    currentUserName: 'vberezny',
+    page: 'game'
   },
   methods: {
     switchToLogin: function() {
@@ -29,7 +30,7 @@ var app = new Vue({
       app.page = 'landing'
     },
     registerUser: function() {
-      //TODO: add checks for all other variables being filled in
+      //TODO: add checks for all other variables being filled in (or input validation on front end)
       if(app.signUpInfo.password === app.signUpInfo.passwordConfirm) {
         $.ajax({
           method: 'post',
@@ -52,6 +53,5 @@ var app = new Vue({
       }
     }
   }
-
 
 });
