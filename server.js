@@ -67,9 +67,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/', express.static('./public', options));
 
-<<<<<<< HEAD
-
-=======
 // register user
 app.post('/register', function(req,res){
   console.log('entered /register');
@@ -89,7 +86,6 @@ app.post('/register', function(req,res){
     res.send('User Registered');//temporary response to see if creation works as intended, change later
   });
 });
->>>>>>> a5692a4c6bde575ed0e5ff1e3eb98bac034c6b12
 
 app.listen(port);
 console.log('running on port',port);
