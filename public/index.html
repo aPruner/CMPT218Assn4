@@ -36,7 +36,7 @@
             <input class="input" type="password" v-model="loginInfo.password">
           </div>
         </div>
-        <a class="button is-primary is-large">Log in</a>
+        <a class="button is-primary is-large" v-on:click="loginUser">Log in</a>
         <a class="button is-primary is-large" v-on:click="switchToLanding">Back</a>
       </div>
     </div>

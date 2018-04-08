@@ -55,7 +55,19 @@ var app = new Vue({
       } else {
         alert('passwords do not match');
       }
+    },
+    loginUser: function() {
+      $.ajax({
+        method: 'post',
+        url: '/login',
+        data: {
+          userName: app.loginInfo.userName,
+          password: app.loginInfo.password
+        },
+        success: function (data) {
+          alert(data); //temporary to prevent errors
+        }
+      });
     }
   }
-
 });
