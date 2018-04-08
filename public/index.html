@@ -186,8 +186,16 @@
   <section v-else-if="page === 'home'">
     <div>
       <div class="container page-container">
-        <h1 class="is-size-2">Welcome, {{ currentUserName }}</h1>
-        <a class="button is-primary is-large" v-on:click="switchToLanding">Log out</a>
+        <h1 class="is-size-2">Welcome, {{ currentUserData.userName }}</h1>
+        <div class="box home-stats-container">
+          <h1 class="is-size-4">Statistics:</h1>
+          <h1 class="is-size-5">Wins: {{ currentUserData.wins }}</h1>
+          <h1 class="is-size-5">Losses: {{ currentUserData.losses }}</h1>
+        </div>
+
+        <div class="home-logout-button">
+          <a class="button is-primary is-large" v-on:click="switchToLanding">Log out</a>
+        </div>
       </div>
     </div>
   </section>

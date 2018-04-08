@@ -16,8 +16,12 @@ var app = new Vue({
       password: '',
       passwordConfirm: ''
     },
-    currentUserName: 'vberezny',
-    page: 'game'
+    currentUserData: {
+      userName: 'vberezny',
+      wins: 0,
+      losses: 0
+    },
+    page: 'home'
   },
   methods: {
     switchToLogin: function() {
