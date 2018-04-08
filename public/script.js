@@ -28,10 +28,20 @@ var app = new Vue({
       app.page = 'login';
     },
     switchToSignup: function() {
-      app.page = 'signup'
+      app.page = 'signup';
     },
     switchToLanding: function() {
-      app.page = 'landing'
+      app.page = 'landing';
+      $.ajax({
+        method: 'post',
+        url: '/logout',
+        data: {
+          user: app.currentUserData.userName
+        },
+        success: function (data) {
+          alert(data); //temporary to prevent errors
+        }
+      });
     },
     registerUser: function() {
       //TODO: add checks for all other variables being filled in (or input validation on front end)

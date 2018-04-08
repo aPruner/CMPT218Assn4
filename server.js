@@ -128,5 +128,12 @@ app.post('/login', passport.authenticate('local', { failureRedirect: '/login' })
   res.send('change this later');
 });
 
+//logout user
+app.get('/logout', function(req, res){
+  console.log('entered /logout');
+  req.logout();
+  res.send(req.user,' is logged out');
+});
+
 app.listen(port);
 console.log('running on port',port);
