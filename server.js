@@ -64,6 +64,7 @@ db.once('open', function(){
 // create Schema
 var Schema = mongoose.Schema;
 
+//create User Schema
 var User = new Schema ({
   userName: String,
   password: String,
@@ -75,8 +76,18 @@ var User = new Schema ({
   gameStats: [{ wins: Number, losses: Number }]
 });
 
-//create model
+//create User model
 var uModel = mongoose.model('uModel', User);
+
+//create game records Schema
+var gameRecords = new Schema ({
+  winner: String,
+  loser: String,
+  date: { type: Date, default: Date.now }
+});
+
+//create game record model
+var records = mongoose.model('records', gameRecords);
 
 //pre hook to bcrypt password
 User.pre('save', function(next){
