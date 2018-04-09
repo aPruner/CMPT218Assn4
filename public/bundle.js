@@ -6473,6 +6473,67 @@ var fillBoard = function() {
   return board;
 };
 
+var setupSocketEventHandlers = function() {
+  socket.on('newGame', function(data) {
+    console.log('inside newGame handler, setting up the game');
+    app.currentUserData.playerSymbol = 'X';
+    app.currentUserData.playerNumber = 1;
+    app.currentGameData.waitingForPlayer = true;
+    app.currentGameData.roomId = data.room;
+
+  });
+
+  socket.on('player1', function(data) {
+    console.log('inside player1 handler');
+    console.log('the game is about to start, as someone has connected!');
+    app.page = 'game';
+    app.currentGameData.waitingForPlayer = false;
+    app.currentGameData.playerTurn = 1;
+    // initialize the game boards
+    app.currentGameData.topBoard = fillBoard();
+    app.currentGameData.middleBoard = fillBoard();
+    app.currentGameData.bottomBoard = fillBoard();
+  });
+
+  socket.on('player2', function(data) {
+    console.log('inside player2 handler');
+    console.log('the game is about to start, you have connected!');
+    app.page = 'game';
+    app.currentUserData.playerSymbol = 'O';
+    app.currentUserData.playerNumber = 2;
+    app.currentGameData.waitingForPlayer = false;
+    app.currentGameData.roomId = data.room;
+    app.currentGameData.playerTurn = 1;
+    // initialize the game boards
+    app.currentGameData.topBoard = fillBoard();
+    app.currentGameData.middleBoard = fillBoard();
+    app.currentGameData.bottomBoard = fillBoard();
+  });
+
+  socket.on('turnWasPlayed', function(data) {
+    console.log('inside turnWasPlayed handler, data is: ', data);
+    console.log('Player ' + parseInt(app.currentGameData.playerTurn) + ' just played a turn');
+    if (app.currentGameData.playerTurn === 1) {
+      app.currentGameData.playerTurn = 2;
+    } else {
+      app.currentGameData.playerTurn = 1;
+    }
+    console.log('Now, it will be ' + parseInt(app.currentGameData.playerTurn) + '\'s turn');
+  });
+
+  socket.on('gameEnd', function(data) {
+    socket.leave(data.room);
+    app.page = 'home';
+    app.currentUserData.playerNumber = 0;
+    app.currentUserData.playerSymbol = '';
+
+  });
+
+  socket.on('err', function(data) {
+    console.log(data.message);
+  });
+};
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -6607,61 +6668,8 @@ var app = new Vue({
     createNewGame: function() {
       socket.emit('createGame', {name: app.currentUserData.userName});
       console.log('lobby has been created, waiting for 2nd player...');
-      socket.on('newGame', function(data) {
-        app.currentUserData.playerSymbol = 'X';
-        app.currentUserData.playerNumber = 1;
-        app.currentGameData.waitingForPlayer = true;
-        app.currentGameData.roomId = data.roomId;
+      setupSocketEventHandlers();
 
-      });
-
-      socket.on('player1', function(data) {
-        console.log('inside player1 handler');
-        console.log('the game is about to start, as someone has connected!');
-        app.page = 'game';
-        app.currentGameData.waitingForPlayer = false;
-        app.currentGameData.currentTurn = 1;
-        // initialize the game boards
-        app.currentGameData.topBoard = fillBoard();
-        app.currentGameData.middleBoard = fillBoard();
-        app.currentGameData.bottomBoard = fillBoard();
-      });
-
-      socket.on('player2', function(data) {
-        console.log('inside player2 handler');
-        console.log('the game is about to start, you have connected!');
-        app.page = 'game';
-        app.currentUserData.playerSymbol = 'O';
-        app.currentUserData.playerNumber = 2;
-        app.currentGameData.waitingForPlayer = false;
-        app.currentGameData.roomId = data.room;
-        app.currentGameData.currentTurn = 1;
-        // initialize the game boards
-        app.currentGameData.topBoard = fillBoard();
-        app.currentGameData.middleBoard = fillBoard();
-        app.currentGameData.bottomBoard = fillBoard();
-      });
-
-      socket.on('turnWasPlayed', function(data) {
-        if (app.currentGameData.currentTurn === 1) {
-          app.currentGameData.currentTurn = 2;
-        } else {
-          app.currentGameData.currentTurn = 1;
-        }
-        console.log('a turn was played!');
-      });
-
-      socket.on('gameEnd', function(data) {
-        socket.leave(data.room);
-        app.page = 'home';
-        app.currentUserData.playerNumber = 0;
-        app.currentUserData.playerSymbol = '';
-
-      });
-
-      socket.on('err', function(data) {
-        console.log(data.message);
-      });
     },
     joinGame: function() {
       console.log('inside joinGame');
@@ -6678,33 +6686,55 @@ var app = new Vue({
               room: roomId
             });
             console.log('joinGame event emitted to backend');
+            setupSocketEventHandlers();
           }
         }
       });
     },
     fillInCell: function(event) {
       console.log('inside fillInCell');
-      console.log(event);
-      if (event && event.target) {
-        event.target.innerHTML = app.currentUserData.playerSymbol;
-        var cell = event.target.className.split(' ')[1].slice(4, 7);
-        var cellY = parseInt(cell[0]);
-        var cellZ = parseInt(cell[1]);
-        var cellX = parseInt(cell[2]);
-        if (cellY === '0') {
-          app.currentGameData.topBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
-        } else if (cellY === '1') {
-          app.currentGameData.middleBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
-        } else {
-          app.currentGameData.bottomBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+      console.log('it is player ' + parseInt(app.currentGameData.playerTurn) + '\'s turn to move');
+      if (app.currentGameData.playerTurn === app.currentUserData.playerNumber) {
+        if (event && event.target) {
+          var cell = event.target.className.split(' ')[1].slice(4, 7);
+          var cellY = parseInt(cell[0]);
+          var cellZ = parseInt(cell[1]);
+          var cellX = parseInt(cell[2]);
+
+          if (app.currentGameData.topBoard[cellZ][cellX] !== '' || app.currentGameData.middleBoard[cellZ][cellX] !== '' || app.currentGameData.bottomBoard[cellZ][cellX] !== '') {
+            alert('This cell has already been filled!');
+            return;
+          }
+
+          if (cellY === '0') {
+            app.currentGameData.topBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+          } else if (cellY === '1') {
+            app.currentGameData.middleBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+          } else {
+            app.currentGameData.bottomBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+          }
+          event.target.innerHTML = app.currentUserData.playerSymbol;
+          socket.emit('playTurn', {
+            cell: cell,
+            room: app.currentGameData.roomId
+          });
+          this.winnerCheck();
         }
+        // run winnerCheck here?
+        // console.log('topBoard');
+        // console.log(app.currentGameData.topBoard);
+        // console.log('middleBoard');
+        // console.log(app.currentGameData.middleBoard);
+        // console.log('bottomBoard');
+        // console.log(app.currentGameData.bottomBoard);
+      } else {
+        alert('It\'s not your turn!');
       }
-      console.log('topBoard');
-      console.log(app.currentGameData.topBoard);
-      console.log('middleBoard');
-      console.log(app.currentGameData.middleBoard);
-      console.log('bottomBoard');
-      console.log(app.currentGameData.bottomBoard);
+    },
+    winnerCheck: function() {
+      //need to check all boards individually, and all boards put together
+      console.log('inside winnerCheck');
+      
     }
     // saveGameStats: function() {
     //   $.ajax({

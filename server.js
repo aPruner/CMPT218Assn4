@@ -206,7 +206,10 @@ io.on('connection', function(socket) {
     rooms++;
     var roomId = 'room-' + rooms;
     socket.join(roomId);
-    socket.emit('newGame', {name: data.name, room: roomId});
+    socket.emit('newGame', {
+      name: data.name,
+      room: roomId
+    });
   });
 
   /**
@@ -221,7 +224,11 @@ io.on('connection', function(socket) {
       console.log('about to emit player1 and player2 events to frontend');
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('player1', {});
-      socket.emit('player2', {name: data.name, room: data.room })
+      socket.emit('player2', {
+        name: data.name,
+        room: data.room
+      });
+      console.log('player1 and player 2 events emitted to frontend');
     } else {
       socket.emit('err', {message: 'Sorry, The room is full!'});
     }
@@ -231,10 +238,17 @@ io.on('connection', function(socket) {
    * Handle the turn played by either player and notify the other.
    */
   socket.on('playTurn', function(data) {
+    console.log('inside playTurn handler');
+    console.log('data is:', data);
+    socket.emit('turnWasPlayed', {
+      cell: data.cell,
+      room: data.room
+    });
     socket.broadcast.to(data.room).emit('turnWasPlayed', {
       cell: data.cell,
       room: data.room
     });
+    console.log('turnWasPlayed event has been broadcasted to the room');
   });
 
   /**
