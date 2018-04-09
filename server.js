@@ -83,7 +83,7 @@ var uModel = mongoose.model('uModel', User);
 var gameRecords = new Schema ({
   winner: String,
   loser: String,
-  date: { type: Date, default: Date.now }
+  date: { type: Date, default: Date.now } //might have to change
 });
 
 //create game record model
@@ -155,7 +155,7 @@ app.get('/failed', function(req,res){
   res.send('Invalid Credentials, try again');
 });
 
-//retrieve user statistics
+//retrieve user statistics for home page
 app.post('/retrieveStats', function(req,res){
   console.log('entered /retrieveStats');
 
@@ -170,6 +170,19 @@ app.post('/logout', function(req, res) {
   console.log('entered /logout');
   req.logout();
   res.send('logged out');
+});
+
+//store game data upon conclusion
+app.post('/storeGameData', function(req,res){
+  console.log('entered /storeGameData');
+  var newGameLog = new records({
+    winner: req.body.winner,
+    loser: req.body.loser
+  });
+  newGameLog.save(function(err){
+    if(err) throw(err);
+    res.send('Game Log saved');
+  });
 });
 
 //sends the latest created room to the user

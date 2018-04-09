@@ -236,5 +236,18 @@ var app = new Vue({
       console.log('bottomBoard');
       console.log(app.currentGameData.bottomBoard);
     }
+    // saveGameStats: function() {
+    //   $.ajax({
+    //     method: 'post',
+    //     url: '/storeGameData',
+    //     data: {
+    //       winner:
+    //       loser:
+    //     },
+    //     success: function(data) {
+    //       alert(data);
+    //     }
+    //   });
+    // }
   }
 });
