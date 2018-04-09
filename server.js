@@ -161,8 +161,6 @@ app.post('/retrieveStats', function(req,res){
 
   uModel.findOne({'userName': req.body.userName}, function(err, obj){
     if(err) throw (err);
-    console.log(obj.userName);
-    console.log(JSON.stringify(obj.gameStats));
     res.send(JSON.stringify(obj.gameStats));
   });
 });
