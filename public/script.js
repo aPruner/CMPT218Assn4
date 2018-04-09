@@ -60,7 +60,9 @@ var app = new Vue({
           },
           success: function (data) {
             alert(data); //temporary to prevent errors
-            app.page = 'landing';
+            if(data === 'User Registered'){
+              app.page = 'landing';
+            }
           }
         });
       } else {

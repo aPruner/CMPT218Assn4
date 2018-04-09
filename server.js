@@ -64,6 +64,7 @@ db.once('open', function(){
 // create Schema
 var Schema = mongoose.Schema;
 
+//create User Schema
 var User = new Schema ({
   userName: String,
   password: String,
@@ -75,8 +76,18 @@ var User = new Schema ({
   gameStats: [{ wins: Number, losses: Number }]
 });
 
-//create model
+//create User model
 var uModel = mongoose.model('uModel', User);
+
+//create game records Schema
+var gameRecords = new Schema ({
+  winner: String,
+  loser: String,
+  date: { type: Date, default: Date.now }
+});
+
+//create game record model
+var records = mongoose.model('records', gameRecords);
 
 //pre hook to bcrypt password
 User.pre('save', function(next){
@@ -109,19 +120,26 @@ app.post('/register', function(req,res){
 
   var stats = {wins:0,losses:0};
 
-  var newUser = new uModel({
-    'userName':req.body.userName,
-    'password':req.body.password,
-    'lastName':req.body.lastName,
-    'firstName':req.body.firstName,
-    'age': req.body.age,
-    'gender': req.body.gender,
-    'email': req.body.email
-  });
-  newUser.gameStats.push(stats);
-  newUser.save(function(err){
-    if(err) throw(err);
-    res.send('User Registered');//temporary response to see if creation works as intended, change later
+  uModel.findOne({'userName': req.body.userName}, function(err, obj){
+    if(obj){
+      console.log('taken');
+      res.send('Username taken, please choose another one');
+    }else{
+      var newUser = new uModel({
+        'userName':req.body.userName,
+        'password':req.body.password,
+        'lastName':req.body.lastName,
+        'firstName':req.body.firstName,
+        'age': req.body.age,
+        'gender': req.body.gender,
+        'email': req.body.email
+      });
+      newUser.gameStats.push(stats);
+      newUser.save(function(err){
+        if(err) throw(err);
+        res.send('User Registered');//temporary response to see if creation works as intended, change later
+      });
+    }
   });
 });
 
@@ -143,8 +161,6 @@ app.post('/retrieveStats', function(req,res){
 
   uModel.findOne({'userName': req.body.userName}, function(err, obj){
     if(err) throw (err);
-    console.log(obj.userName);
-    console.log(JSON.stringify(obj.gameStats));
     res.send(JSON.stringify(obj.gameStats));
   });
 });
