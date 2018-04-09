@@ -150,7 +150,7 @@ app.post('/retrieveStats', function(req,res){
 });
 
 //logout user
-app.post('/logout', function(req, res){
+app.post('/logout', function(req, res) {
   console.log('entered /logout');
   req.logout();
   res.send('logged out');
@@ -159,7 +159,11 @@ app.post('/logout', function(req, res){
 //sends the latest created room to the user
 app.get('/rooms', function(req, res) {
   console.log('entered /rooms');
-  res.send('room-' + rooms);
+  if (rooms === 0) {
+    res.send('no rooms created');
+  } else {
+    res.send('room-' + rooms);
+  }
 });
 
 io.on('connection', function(socket) {
