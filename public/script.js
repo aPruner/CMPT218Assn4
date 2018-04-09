@@ -142,5 +142,18 @@ var app = new Vue({
         }
       });
     }
+    // saveGameStats: function() {
+    //   $.ajax({
+    //     method: 'post',
+    //     url: '/storeGameData',
+    //     data: {
+    //       winner:
+    //       loser:
+    //     },
+    //     success: function(data) {
+    //       alert(data);
+    //     }
+    //   });
+    // }
   }
 });
