@@ -109,19 +109,26 @@ app.post('/register', function(req,res){
 
   var stats = {wins:0,losses:0};
 
-  var newUser = new uModel({
-    'userName':req.body.userName,
-    'password':req.body.password,
-    'lastName':req.body.lastName,
-    'firstName':req.body.firstName,
-    'age': req.body.age,
-    'gender': req.body.gender,
-    'email': req.body.email
-  });
-  newUser.gameStats.push(stats);
-  newUser.save(function(err){
-    if(err) throw(err);
-    res.send('User Registered');//temporary response to see if creation works as intended, change later
+  uModel.findOne({'userName': req.body.userName}, function(err, obj){
+    if(obj){
+      console.log('taken');
+      res.send('Username taken, please choose another one');
+    }else{
+      var newUser = new uModel({
+        'userName':req.body.userName,
+        'password':req.body.password,
+        'lastName':req.body.lastName,
+        'firstName':req.body.firstName,
+        'age': req.body.age,
+        'gender': req.body.gender,
+        'email': req.body.email
+      });
+      newUser.gameStats.push(stats);
+      newUser.save(function(err){
+        if(err) throw(err);
+        res.send('User Registered');//temporary response to see if creation works as intended, change later
+      });
+    }
   });
 });
 
