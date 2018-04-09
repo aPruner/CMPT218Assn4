@@ -1,5 +1,18 @@
 var io = require('socket.io-client');
-var socket = io.connect('http://localhost:3000'), player, game;
+var socket = io.connect('http://localhost:3000');
+
+var player;
+
+var fillBoard = function() {
+  var board = [];
+  for (var i = 0; i < 3; i++) {
+    board.push([]);
+    for (var j = 0; j < 3; j++) {
+      board[i].push('');
+    }
+  }
+  return board;
+};
 
 var app = new Vue({
   el: '#app',
@@ -23,9 +36,15 @@ var app = new Vue({
       userName: '',
       wins: 0,
       losses: 0,
-      totalGames: 0
+      totalGames: 0,
+      playerNumber: 0,
+      playerSymbol: ''
     },
     currentGameData: {
+      boardVisible: false,
+      topBoard: [],
+      middleBoard: [],
+      bottomBoard: [],
       p1UserName: '',
       p2UserName: '',
       playerTurn: 0,
@@ -102,7 +121,7 @@ var app = new Vue({
                 app.currentUserData.totalGames = games;
               }
             });
-          }else{
+          } else {
             alert(data);
           }
         }
@@ -129,7 +148,47 @@ var app = new Vue({
       console.log('inside createNewGame');
       socket.emit('createGame', {name: app.currentUserData.userName});
       console.log('createGame emitted to server side');
+      app.currentGameData.boardVisible = true;
       app.page = 'game';
+      app.currentUserData.playerSymbol = 'X';
+      app.currentUserData.playerNumber = 1;
+
+      // initialize the game boards
+      app.currentGameData.topBoard = fillBoard();
+      app.currentGameData.middleBoard = fillBoard();
+      app.currentGameData.bottomBoard = fillBoard();
+
+      socket.on('player1', function(data) {
+        console.log('inside player1 handler');
+        console.log('the game is about to start!');
+        app.currentGameData.currentTurn = 1;
+      });
+
+      socket.on('player2', function(data) {
+        console.log('inside player2 handler');
+        console.log('the game is about to start!');
+        app.currentGameData.currentTurn = 1;
+      });
+
+      socket.on('turnWasPlayed', function(data) {
+        if (app.currentGameData.currentTurn === 1) {
+          app.currentGameData.currentTurn = 2;
+        } else {
+          app.currentGameData.currentTurn = 1;
+        }
+      });
+
+      socket.on('gameEnd', function(data) {
+        socket.leave(data.room);
+        app.page = 'home';
+        app.currentUserData.playerNumber = 0;
+        app.currentUserData.playerSymbol = '';
+
+      });
+
+      socket.on('err', function(data) {
+        console.log(data.message);
+      });
     },
     joinGame: function() {
       console.log('inside joinGame');
@@ -147,9 +206,35 @@ var app = new Vue({
             });
             console.log('joinGame emitted to server side');
             app.page = 'game';
+            app.currentUserData.playerSymbol = 'O';
+            app.currentUserData.playerNumber = 2;
           }
         }
       });
+    },
+    fillInCell: function(event) {
+      console.log('inside fillInCell');
+      console.log(event);
+      if (event && event.target) {
+        event.target.innerHTML = app.currentUserData.playerSymbol;
+        var cell = event.target.className.split(' ')[1].slice(4, 7);
+        var cellY = cell[0];
+        var cellZ = cell[1];
+        var cellX = cell[2];
+        if (cellY === '0') {
+          app.currentGameData.topBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+        } else if (cellY === '1') {
+          app.currentGameData.middleBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+        } else {
+          app.currentGameData.bottomBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
+        }
+      }
+      console.log('topBoard');
+      console.log(app.currentGameData.topBoard);
+      console.log('middleBoard');
+      console.log(app.currentGameData.middleBoard);
+      console.log('bottomBoard');
+      console.log(app.currentGameData.bottomBoard);
     }
   }
 });

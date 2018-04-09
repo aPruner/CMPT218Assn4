@@ -54,10 +54,6 @@ div .middle-board-container {
   margin-left: 15px;
 }
 
-div .bottom-board-container {
-
-}
-
 div .game-cell-row {
   width: 100%;
   height: 33%;
@@ -71,6 +67,9 @@ div .game-cell {
   border: solid 1px black;
   display: block;
   float: left;
+  font-size: 45pt;
+  text-align: center;
+  display: table-cell;
 }
 
 div .home-stats-container {
