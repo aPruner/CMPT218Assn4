@@ -229,12 +229,17 @@ var app = new Vue({
           app.currentGameData.bottomBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
         }
       }
+      //run winnerCheck here?
       console.log('topBoard');
       console.log(app.currentGameData.topBoard);
       console.log('middleBoard');
       console.log(app.currentGameData.middleBoard);
       console.log('bottomBoard');
       console.log(app.currentGameData.bottomBoard);
+    },
+    winnerCheck: function() {
+      //need to check all boards individually, and all boards put together
+      
     }
     // saveGameStats: function() {
     //   $.ajax({
