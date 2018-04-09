@@ -1,8 +1,6 @@
 var io = require('socket.io-client');
 var socket = io.connect('http://localhost:3000');
 
-var player;
-
 var fillBoard = function() {
   var board = [];
   for (var i = 0; i < 3; i++) {
@@ -41,14 +39,15 @@ var app = new Vue({
       playerSymbol: ''
     },
     currentGameData: {
-      boardVisible: false,
+      waitingForPlayer: true,
       topBoard: [],
       middleBoard: [],
       bottomBoard: [],
       p1UserName: '',
       p2UserName: '',
       playerTurn: 0,
-      playerWhoWon: 0
+      playerWhoWon: 0,
+      roomId: ''
     },
     page: 'landing'
   },
@@ -145,29 +144,41 @@ var app = new Vue({
       });
     },
     createNewGame: function() {
-      console.log('inside createNewGame');
       socket.emit('createGame', {name: app.currentUserData.userName});
-      console.log('createGame emitted to server side');
-      app.currentGameData.boardVisible = true;
-      app.page = 'game';
-      app.currentUserData.playerSymbol = 'X';
-      app.currentUserData.playerNumber = 1;
+      console.log('lobby has been created, waiting for 2nd player...');
+      socket.on('newGame', function(data) {
+        app.currentUserData.playerSymbol = 'X';
+        app.currentUserData.playerNumber = 1;
+        app.currentGameData.waitingForPlayer = true;
+        app.currentGameData.roomId = data.roomId;
 
-      // initialize the game boards
-      app.currentGameData.topBoard = fillBoard();
-      app.currentGameData.middleBoard = fillBoard();
-      app.currentGameData.bottomBoard = fillBoard();
+      });
 
       socket.on('player1', function(data) {
         console.log('inside player1 handler');
-        console.log('the game is about to start!');
+        console.log('the game is about to start, as someone has connected!');
+        app.page = 'game';
+        app.currentGameData.waitingForPlayer = false;
         app.currentGameData.currentTurn = 1;
+        // initialize the game boards
+        app.currentGameData.topBoard = fillBoard();
+        app.currentGameData.middleBoard = fillBoard();
+        app.currentGameData.bottomBoard = fillBoard();
       });
 
       socket.on('player2', function(data) {
         console.log('inside player2 handler');
-        console.log('the game is about to start!');
+        console.log('the game is about to start, you have connected!');
+        app.page = 'game';
+        app.currentUserData.playerSymbol = 'O';
+        app.currentUserData.playerNumber = 2;
+        app.currentGameData.waitingForPlayer = false;
+        app.currentGameData.roomId = data.room;
         app.currentGameData.currentTurn = 1;
+        // initialize the game boards
+        app.currentGameData.topBoard = fillBoard();
+        app.currentGameData.middleBoard = fillBoard();
+        app.currentGameData.bottomBoard = fillBoard();
       });
 
       socket.on('turnWasPlayed', function(data) {
@@ -176,6 +187,7 @@ var app = new Vue({
         } else {
           app.currentGameData.currentTurn = 1;
         }
+        console.log('a turn was played!');
       });
 
       socket.on('gameEnd', function(data) {
@@ -204,10 +216,7 @@ var app = new Vue({
               name: app.currentUserData.userName,
               room: roomId
             });
-            console.log('joinGame emitted to server side');
-            app.page = 'game';
-            app.currentUserData.playerSymbol = 'O';
-            app.currentUserData.playerNumber = 2;
+            console.log('joinGame event emitted to backend');
           }
         }
       });
@@ -218,9 +227,9 @@ var app = new Vue({
       if (event && event.target) {
         event.target.innerHTML = app.currentUserData.playerSymbol;
         var cell = event.target.className.split(' ')[1].slice(4, 7);
-        var cellY = cell[0];
-        var cellZ = cell[1];
-        var cellX = cell[2];
+        var cellY = parseInt(cell[0]);
+        var cellZ = parseInt(cell[1]);
+        var cellX = parseInt(cell[2]);
         if (cellY === '0') {
           app.currentGameData.topBoard[cellZ][cellX] = app.currentUserData.playerSymbol;
         } else if (cellY === '1') {

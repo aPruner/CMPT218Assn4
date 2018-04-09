@@ -201,10 +201,10 @@ io.on('connection', function(socket) {
   /**
    * Create a new game room and notify the creator of game.
    */
-  socket.on('createGame', function(data){
+  socket.on('createGame', function(data) {
     console.log('entered createGame event handler');
     rooms++;
-    var roomId = 'rooms-' + rooms;
+    var roomId = 'room-' + rooms;
     socket.join(roomId);
     socket.emit('newGame', {name: data.name, room: roomId});
   });
@@ -212,9 +212,13 @@ io.on('connection', function(socket) {
   /**
    * Connect the Player 2 to the room he requested. Show error if room full.
    */
-  socket.on('joinGame', function(data){
+  socket.on('joinGame', function(data) {
+    console.log('inside joinGame handler');
+    console.log('data is:', data);
     var room = io.nsps['/'].adapter.rooms[data.room];
+    console.log('room is:', room);
     if(room && room.length === 1){
+      console.log('about to emit player1 and player2 events to frontend');
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('player1', {});
       socket.emit('player2', {name: data.name, room: data.room })
@@ -226,7 +230,7 @@ io.on('connection', function(socket) {
   /**
    * Handle the turn played by either player and notify the other.
    */
-  socket.on('playTurn', function(data){
+  socket.on('playTurn', function(data) {
     socket.broadcast.to(data.room).emit('turnWasPlayed', {
       cell: data.cell,
       room: data.room
@@ -236,7 +240,7 @@ io.on('connection', function(socket) {
   /**
    * Notify the players about the victor.
    */
-  socket.on('gameEnded', function(data){
+  socket.on('gameEnded', function(data) {
     socket.broadcast.to(data.room).emit('gameEnd', data);
   });
 });
