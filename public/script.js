@@ -614,13 +614,55 @@ var app = new Vue({
         winSt = '';
       }
 
-      //check diagonally sideways through all boards
+      //check diagonally up through all boards
+      winSt = '';
+      i = 2;
+      for (j = 0; j < 3; j++) {
+        winSt += app.currentGameData.topBoard[i][j];
+        winSt += app.currentGameData.middleBoard[i-1][j];
+        winSt += app.currentGameData.bottomBoard[i-2][j];
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+        winSt = '';
+      }
+
+      //check diagonally right through all boards
       winSt = '';
       j = 0;
       for (i = 0; i < 3; i++) {
         winSt += app.currentGameData.topBoard[i][j];
         winSt += app.currentGameData.middleBoard[i][j+1];
         winSt += app.currentGameData.bottomBoard[i][j+2];
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+        winSt = '';
+      }
+
+      //check diagonally left through all boards
+      winSt = '';
+      j = 2;
+      for (i = 0; i < 3; i++) {
+        winSt += app.currentGameData.topBoard[i][j];
+        winSt += app.currentGameData.middleBoard[i][j-1];
+        winSt += app.currentGameData.bottomBoard[i][j-2];
         if (winSt === 'XXX') {
           return {
             winnerExists: true,
