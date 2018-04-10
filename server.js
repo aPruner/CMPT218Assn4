@@ -198,9 +198,6 @@ app.get('/rooms', function(req, res) {
 io.on('connection', function(socket) {
   // Reference: https://ayushgp.github.io/Tic-Tac-Toe-Socket-IO/
 
-  /**
-   * Create a new game room and notify the creator of game.
-   */
   socket.on('createGame', function(data) {
     console.log('entered createGame event handler');
     rooms++;
@@ -212,9 +209,6 @@ io.on('connection', function(socket) {
     });
   });
 
-  /**
-   * Connect the Player 2 to the room he requested. Show error if room full.
-   */
   socket.on('joinGame', function(data) {
     console.log('inside joinGame handler');
     console.log('data is:', data);
@@ -234,29 +228,25 @@ io.on('connection', function(socket) {
     }
   });
 
-  /**
-   * Handle the turn played by either player and notify the other.
-   */
   socket.on('playTurn', function(data) {
     console.log('inside playTurn handler');
     console.log('data is:', data);
     socket.emit('turnWasPlayed', {
       cell: data.cell,
       symbol: data.symbol,
-      room: data.room,
+      room: data.room
     });
     socket.broadcast.to(data.room).emit('turnWasPlayed', {
       cell: data.cell,
       symbol: data.symbol,
-      room: data.room,
+      room: data.room
     });
     console.log('turnWasPlayed event has been broadcasted to the room');
   });
 
-  /**
-   * Notify the players about the victor.
-   */
   socket.on('gameEnded', function(data) {
+    socket.leave(data.room);
+    socket.emit('gameEnd', data);
     socket.broadcast.to(data.room).emit('gameEnd', data);
   });
 });

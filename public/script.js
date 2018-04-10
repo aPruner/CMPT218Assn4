@@ -39,7 +39,7 @@ var app = new Vue({
       playerSymbol: ''
     },
     currentGameData: {
-      waitingForPlayer: true,
+      waitingForPlayer: false,
       topBoard: [],
       middleBoard: [],
       bottomBoard: [],
@@ -47,7 +47,9 @@ var app = new Vue({
       p2UserName: '',
       playerTurn: 0,
       playerWhoWon: 0,
-      roomId: ''
+      roomId: '',
+      totalXonBoard: 0,
+      totalYonBoard: 0
     },
     page: 'landing'
   },
@@ -165,6 +167,7 @@ var app = new Vue({
         app.page = 'game';
         app.currentGameData.waitingForPlayer = false;
         app.currentGameData.playerTurn = 1;
+        app.currentGameData.p1UserName = app.currentUserData.userName;
         // initialize the game boards
         app.currentGameData.topBoard = fillBoard();
         app.currentGameData.middleBoard = fillBoard();
@@ -180,6 +183,7 @@ var app = new Vue({
         app.currentGameData.waitingForPlayer = false;
         app.currentGameData.roomId = data.room;
         app.currentGameData.playerTurn = 1;
+        app.currentGameData.p2UserName = app.currentUserData.userName;
         // initialize the game boards
         app.currentGameData.topBoard = fillBoard();
         app.currentGameData.middleBoard = fillBoard();
@@ -195,15 +199,41 @@ var app = new Vue({
         } else {
           app.currentGameData.playerTurn = 1;
         }
-        console.log('Now, it will be player' + parseInt(app.currentGameData.playerTurn) + '\'s turn');
+
+        // check for a winner!
+        var winnerObject = {};
+        if (app.currentGameData.totalXonBoard >= 3 || app.currentGameData.totalYonBoard >= 3) {
+          winnerObject = app.checkForWin();
+        }
+        if (!winnerObject.winnerExists) {
+          console.log('Now, it will be player' + parseInt(app.currentGameData.playerTurn) + '\'s turn');
+        } else {
+          console.log('The game has ended, and player ' + parseInt(winnerObject.winner) + ' has won the game!');
+          socket.emit('gameEnded', {
+            room: data.room,
+            winner: winnerObject.winner
+          });
+        }
       });
 
       socket.on('gameEnd', function(data) {
-        socket.leave(data.room);
+        console.log('Good game! Stats will be recorded for this match');
         app.page = 'home';
         app.currentUserData.playerNumber = 0;
         app.currentUserData.playerSymbol = '';
-
+        app.currentGameData = {
+          waitingForPlayer: false,
+          topBoard: [],
+          middleBoard: [],
+          bottomBoard: [],
+          p1UserName: '',
+          p2UserName: '',
+          playerTurn: 0,
+          playerWhoWon: 0,
+          roomId: '',
+          totalXonBoard: 0,
+          totalYonBoard: 0
+        };
       });
 
       socket.on('err', function(data) {
@@ -231,7 +261,7 @@ var app = new Vue({
       });
     },
     playTurn: function(event) {
-      console.log('inside fillInCell');
+      // console.log('inside playTurn');
       console.log('it is player ' + parseInt(app.currentGameData.playerTurn) + '\'s turn to move');
       if (app.currentGameData.playerTurn === app.currentUserData.playerNumber) {
         if (event && event.target) {
@@ -248,12 +278,9 @@ var app = new Vue({
           socket.emit('playTurn', {
             cell: cell,
             symbol: app.currentUserData.playerSymbol,
-            room: app.currentGameData.roomId,
+            room: app.currentGameData.roomId
           });
-          // this.updateUI(event);
-          this.winnerCheck();
         }
-        // run winnerCheck here?
       } else {
         alert('It\'s not your turn!');
       }
@@ -271,18 +298,260 @@ var app = new Vue({
       } else {
         app.currentGameData.bottomBoard[cellZ][cellX] = data.symbol;
       }
+      if (data.symbol === 'X') {
+        app.currentGameData.totalXonBoard++;
+      } else if (data.symbol === 'Y') {
+        app.currentGameData.totalYonBoard++;
+      }
       $('.cell' + data.cell).html(data.symbol);
-      console.log('topBoard');
-      console.log(app.currentGameData.topBoard);
-      console.log('middleBoard');
-      console.log(app.currentGameData.middleBoard);
-      console.log('bottomBoard');
-      console.log(app.currentGameData.bottomBoard);
+      // console.log('topBoard');
+      // console.log(app.currentGameData.topBoard);
+      // console.log('middleBoard');
+      // console.log(app.currentGameData.middleBoard);
+      // console.log('bottomBoard');
+      // console.log(app.currentGameData.bottomBoard);
     },
-    winnerCheck: function() {
-      //need to check all boards individually, and all boards put together
-      console.log('inside winnerCheck');
-      
+    checkForWin: function() {
+      // need to check all boards individually, and all boards put together
+      console.log('inside checkForWin');
+
+      // first check individual boards for win conditions
+
+      // top board rows
+      var winSt = '';
+      var i;
+      var j;
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.topBoard[i][j]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // top board columns
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.topBoard[j][i]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // top board diagonals
+      winSt = '';
+      for (i = 0; i < 3; i++) {
+        winSt += app.currentGameData.topBoard[i][i]
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      winSt = '';
+      i = 2;
+      j = 0;
+      while (j < 3 && i >= 0) {
+        winSt += app.currentGameData.topBoard[i][j];
+        i--;
+        j++;
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      // middle board rows
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.middleBoard[i][j]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // middle board columns
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.middleBoard[j][i]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // middle board diagonals
+      winSt = '';
+      for (i = 0; i < 3; i++) {
+        winSt += app.currentGameData.middleBoard[i][i]
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      winSt = '';
+      i = 2;
+      j = 0;
+      while (j < 3 && i >= 0) {
+        winSt += app.currentGameData.middleBoard[i][j];
+        i--;
+        j++;
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      // bottom board rows
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.bottomBoard[i][j]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // bottom board columns
+      for (i = 0; i < 3; i++) {
+        winSt = '';
+        for (j = 0; j < 3; j++) {
+          winSt += app.currentGameData.bottomBoard[j][i]
+        }
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+      }
+
+      // bottom board diagonals
+      winSt = '';
+      for (i = 0; i < 3; i++) {
+        winSt += app.currentGameData.bottomBoard[i][i]
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      winSt = '';
+      i = 2;
+      j = 0;
+      while (j < 3 && i >= 0) {
+        winSt += app.currentGameData.bottomBoard[i][j];
+        i--;
+        j++;
+      }
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      // now check cross board win conditions
+      var board3d = [app.currentGameData.topBoard, app.currentGameData.middleBoard, app.currentGameData.bottomBoard];
+
+      return {
+        winnerExists: false,
+        winner: 0
+      };
     }
     // saveGameStats: function() {
     //   $.ajax({
