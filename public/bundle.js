@@ -6570,17 +6570,11 @@ var app = new Vue({
                 userName: app.currentUserData.userName
               },
               success: function(data) {
-                var wins = 0;
-                var losses = 0;
-                var games = 0;
-                $.each(JSON.parse(data), function(i, item){
-                  wins = item.wins;
-                  losses = item.losses;
-                  games = wins + losses;
-                });
-                app.currentUserData.wins = wins;
-                app.currentUserData.losses = losses;
-                app.currentUserData.totalGames = games;
+                var parsedObject = JSON.parse(data);
+
+                app.currentUserData.wins = parsedObject.wins;
+                app.currentUserData.losses = parsedObject.losses;
+                app.currentUserData.totalGames = app.currentUserData.wins + app.currentUserData.losses;
               }
             });
           } else {
@@ -6676,9 +6670,35 @@ var app = new Vue({
           });
         }
       });
-
       socket.on('gameEnd', function(data) {
         console.log('Good game! Stats will be recorded for this match');
+
+        var recordObject = {winner:'', loser:''};
+        var playerStatsObject = {userName:'', wins:0, losses:0};
+
+        if(data.winner === app.currentUserData.playerNumber){ //current user won
+          playerStatsObject.userName = app.currentUserData.userName;
+          playerStatsObject.wins = 1;
+          playerStatsObject.losses = 0;
+
+          recordObject.winner = app.currentUserData.userName;
+          if(app.currentUserData.playerNumber === 1){
+            recordObject.loser = app.currentGameData.p2UserName;
+          }else{
+            recordObject.loser = app.currentGameData.p1UserName;
+          }
+          console.log('winner: ', recordObject.winner);
+          console.log('loser: ', recordObject.loser);
+
+          app.saveGameStats(recordObject);
+          app.savePlayerStats(playerStatsObject);
+        }else{ //current user lost
+          playerStatsObject.userName = app.currentUserData.userName;
+          playerStatsObject.losses = 1;
+          playerStatsObject.wins = 0;
+          app.savePlayerStats(playerStatsObject);
+        }
+
         app.page = 'home';
         app.currentUserData.playerNumber = 0;
         app.currentUserData.playerSymbol = '';
@@ -7013,20 +7033,40 @@ var app = new Vue({
         winnerExists: false,
         winner: 0
       };
+    },
+    saveGameStats: function(data) {
+      console.log('entered saveGameStats');
+      console.log('data: ', data);
+      $.ajax({
+        method: 'post',
+        url: '/storeGameData',
+        data: {
+          winner: data.winner,
+          loser: data.loser
+        },
+        success: function(data) {
+          alert(data);
+        }
+      });
+    },
+    savePlayerStats: function(data) {
+      //send over record object with 1 and 0 for win/loss columns
+      //in server.js, find the user and add 1 and 0 to their win/loss totals
+      console.log('entered savePlayerStats');
+      console.log('data: ', data);
+      $.ajax({
+        method: 'post',
+        url: '/savePlayerStats',
+        data: {
+          userName: data.userName,
+          wins: data.wins,
+          losses: data.losses
+        },
+        success: function(data) {
+          alert(data);
+        }
+      });
     }
-    // saveGameStats: function() {
-    //   $.ajax({
-    //     method: 'post',
-    //     url: '/storeGameData',
-    //     data: {
-    //       winner:
-    //       loser:
-    //     },
-    //     success: function(data) {
-    //       alert(data);
-    //     }
-    //   });
-    // }
   }
 });
 },{"socket.io-client":32}]},{},[47]);
