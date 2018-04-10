@@ -286,7 +286,7 @@ io.on('connection', function(socket) {
     });
     console.log('turnWasPlayed event has been broadcast to the room');
   });
-  
+
   socket.on('leaveGame', function(data) {
     console.log('the game has ended, second socket is about to leave');
     console.log(io.nsps['/'].adapter.rooms[data.room]);

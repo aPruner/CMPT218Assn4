@@ -51,6 +51,7 @@ var app = new Vue({
       totalXonBoard: 0,
       totalYonBoard: 0
     },
+    socketEventsSetup: false,
     page: 'landing'
   },
   methods: {
@@ -142,7 +143,11 @@ var app = new Vue({
     createNewGame: function() {
       socket.emit('createGame', {p1UserName: app.currentUserData.userName});
       console.log('lobby has been created, waiting for 2nd player...');
-      this.setupSocketEventHandlers();
+      if (!app.socketEventsSetup) {
+        console.log('setting up socket event handlers, this should only ever happen once for each client');
+        app.setupSocketEventHandlers();
+        app.socketEventsSetup = true;
+      }
     },
     setupSocketEventHandlers: function() {
       socket.on('newGame', function(data) {
@@ -248,7 +253,11 @@ var app = new Vue({
               room: roomId
             });
             console.log('joinGame event emitted to backend');
-            app.setupSocketEventHandlers();
+            if (!app.socketEventsSetup) {
+              console.log('setting up socket event handlers, this should only ever happen once for each client');
+              app.setupSocketEventHandlers();
+              app.socketEventsSetup = true;
+            }
           }
         }
       });
