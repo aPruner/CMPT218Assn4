@@ -224,7 +224,7 @@ io.on('connection', function(socket) {
     var roomId = 'room-' + rooms;
     socket.join(roomId);
     socket.emit('newGame', {
-      name: data.name,
+      p1UserName: data.p1UserName,
       room: roomId
     });
   });
@@ -239,13 +239,27 @@ io.on('connection', function(socket) {
       socket.join(data.room);
       socket.broadcast.to(data.room).emit('player1', {});
       socket.emit('player2', {
-        name: data.name,
+        p2UserName: data.p2UserName,
         room: data.room
       });
       console.log('player1 and player 2 events emitted to frontend');
     } else {
       socket.emit('err', {message: 'Sorry, The room is full!'});
     }
+  });
+
+  socket.on('updateUserNames', function(data) {
+    console.log('inside updateUserNames handler');
+    socket.emit('updateNames', {
+      p1UserName: data.p1UserName,
+      p2UserName: data.p2UserName,
+      room: data.room
+    });
+    socket.broadcast.to(data.room).emit('updateNames', {
+      p1UserName: data.p1UserName,
+      p2UserName: data.p2UserName,
+      room: data.room
+    });
   });
 
   socket.on('playTurn', function(data) {
