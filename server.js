@@ -191,17 +191,23 @@ app.post('/storeGameData', function(req,res){
 //update players stats upon conclusion of game
 app.post('/savePlayerStats', function (req,res) {
   console.log('entered /savePlayerStats');
-  uModel.findOne({'userName': req.body.userName}, function(err, obj){
+  var wins = req.body.wins;
+  var losses = req.body.losses;
+  uModel.findOneAndUpdate({'userName': req.body.userName}, function(err, obj){
     if(err) throw (err);
-    // console.log('document owner: ', obj.userName);
-    // console.log('current wins: ', obj.gameStats.wins);
-    // console.log('current losses: ', obj.gameStats.losses);
-    // obj.gameStats.wins += req.body.wins;
-    // obj.gameStats.losses += req.body.losses;
-    // console.log('modified wins: ', obj.gameStats.wins);
-    // console.log('modified losses: ', obj.gameStats.losses);
-    // obj.save();
-    res.send('Players stats updated');
+    console.log('document owner: ', obj.userName);
+    console.log('current wins: ', obj.gameStats.wins);
+    console.log('current losses: ', obj.gameStats.losses);
+    wins += Number(obj.gameStats.wins);
+    losses += Number(obj.gameStats.losses);
+    obj.gameStats.wins = wins;
+    obj.gameStats.losses = losses;
+    console.log('modified wins: ', obj.gameStats.wins);
+    console.log('modified losses: ', obj.gameStats.losses);
+    obj.save(function(err){
+      if(err) throw(err);
+      res.send('Players stats updated');
+    });
   });
 });
 
