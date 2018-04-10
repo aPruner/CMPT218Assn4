@@ -178,7 +178,7 @@
           <div class="box game-ui-container">
             <h1 class="is-size-3">Game info:</h1>
             <h1 class="is-size-5">It is currently Player {{ currentGameData.playerTurn }}'s turn </h1>
-            <a class="button is-primary is-large">Resign</a>
+            <a class="button is-primary is-large" v-on:click="quitGame">Resign</a>
           </div>
         </div>
       </div>

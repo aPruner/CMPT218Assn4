@@ -286,6 +286,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('gameEnded', function(data) {
+    console.log('inside gameEnded handler');
     socket.leave(data.room);
     socket.emit('gameEnd', data);
     socket.broadcast.to(data.room).emit('gameEnd', data);

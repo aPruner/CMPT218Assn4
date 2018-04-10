@@ -627,6 +627,18 @@ var app = new Vue({
           app.currentUserData.totalGames = app.currentUserData.wins + app.currentUserData.losses;
         }
       });
+    },
+    quitGame: function(){
+      var winner = 0;
+      if(app.currentUserData.playerNumber === 1){
+        winner = 2;
+      }else{
+        winner = 1;
+      }
+      socket.emit('gameEnded', {
+        room: app.currentGameData.roomId,
+        winner: winner
+      });
     }
   }
 });

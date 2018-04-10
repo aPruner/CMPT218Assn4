@@ -7057,7 +7057,6 @@ var app = new Vue({
     },
     saveGameStats: function(data) {
       console.log('entered saveGameStats');
-      console.log('data: ', data);
       $.ajax({
         method: 'post',
         url: '/storeGameData',
@@ -7073,7 +7072,6 @@ var app = new Vue({
     savePlayerStats: function(data) {
       //send over record object with 1 and 0 for win/loss columns
       console.log('entered savePlayerStats');
-      console.log('data: ', data);
       $.ajax({
         method: 'post',
         url: '/savePlayerStats',
@@ -7089,6 +7087,18 @@ var app = new Vue({
           app.currentUserData.losses = parsedObject.losses;
           app.currentUserData.totalGames = app.currentUserData.wins + app.currentUserData.losses;
         }
+      });
+    },
+    quitGame: function(){
+      var winner = 0;
+      if(app.currentUserData.playerNumber === 1){
+        winner = 2;
+      }else{
+        winner = 1;
+      }
+      socket.emit('gameEnded', {
+        room: app.currentGameData.roomId,
+        winner: winner
       });
     }
   }
