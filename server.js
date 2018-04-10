@@ -73,7 +73,10 @@ var User = new Schema ({
   age: Number,
   gender: String,
   email: String,
-  gameStats: Object
+  gameStats: {
+    wins: Number,
+    losses: Number
+  }
 });
 
 //create User model
@@ -118,8 +121,6 @@ app.use('/', express.static('./public', options));
 app.post('/register', function(req,res){
   console.log('entered /register');
 
-  var statsObject = {wins:0,losses:0};
-
   uModel.findOne({'userName': req.body.userName}, function(err, obj){
     if(obj){
       console.log('taken');
@@ -133,7 +134,8 @@ app.post('/register', function(req,res){
         'age': req.body.age,
         'gender': req.body.gender,
         'email': req.body.email,
-        'gameStats': statsObject
+        'gameStats.wins': 0,
+        'gameStats.losses': 0
       });
       //newUser.gameStats.push(stats);
       newUser.save(function(err){
@@ -176,8 +178,6 @@ app.post('/logout', function(req, res) {
 //store game data upon conclusion of game
 app.post('/storeGameData', function(req,res){
   console.log('entered /storeGameData');
-  console.log('winner: ', req.body.winner);
-  console.log('loser: ', req.body.loser);
   var newGameLog = new records({
     winner: req.body.winner,
     loser: req.body.loser
@@ -191,22 +191,23 @@ app.post('/storeGameData', function(req,res){
 //update players stats upon conclusion of game
 app.post('/savePlayerStats', function (req,res) {
   console.log('entered /savePlayerStats');
-  var wins = req.body.wins;
-  var losses = req.body.losses;
-  uModel.findOneAndUpdate({'userName': req.body.userName}, function(err, obj){
+  var wins = parseInt(req.body.wins);
+  var losses = parseInt(req.body.losses);
+  uModel.findOne({'userName': req.body.userName}, function(err, obj){
     if(err) throw (err);
     console.log('document owner: ', obj.userName);
     console.log('current wins: ', obj.gameStats.wins);
     console.log('current losses: ', obj.gameStats.losses);
-    wins += Number(obj.gameStats.wins);
-    losses += Number(obj.gameStats.losses);
+    wins = wins + parseInt(obj.gameStats.wins);
+    losses = losses + parseInt(obj.gameStats.losses);
     obj.gameStats.wins = wins;
     obj.gameStats.losses = losses;
     console.log('modified wins: ', obj.gameStats.wins);
     console.log('modified losses: ', obj.gameStats.losses);
     obj.save(function(err){
+      console.log('saved');
       if(err) throw(err);
-      res.send('Players stats updated');
+      res.send(JSON.stringify(obj.gameStats));
     });
   });
 });

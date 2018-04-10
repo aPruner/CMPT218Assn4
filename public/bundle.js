@@ -7072,7 +7072,6 @@ var app = new Vue({
     },
     savePlayerStats: function(data) {
       //send over record object with 1 and 0 for win/loss columns
-      //in server.js, find the user and add 1 and 0 to their win/loss totals
       console.log('entered savePlayerStats');
       console.log('data: ', data);
       $.ajax({
@@ -7084,7 +7083,11 @@ var app = new Vue({
           losses: data.losses
         },
         success: function(data) {
-          alert(data);
+          var parsedObject = JSON.parse(data);
+
+          app.currentUserData.wins = parsedObject.wins;
+          app.currentUserData.losses = parsedObject.losses;
+          app.currentUserData.totalGames = app.currentUserData.wins + app.currentUserData.losses;
         }
       });
     }
