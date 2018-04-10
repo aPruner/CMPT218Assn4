@@ -80,7 +80,7 @@ var app = new Vue({
             password: app.signUpInfo.password
           },
           success: function (data) {
-            alert(data); //temporary to prevent errors
+            alert(data);
             if(data === 'User Registered'){
               app.page = 'landing';
             }
@@ -131,7 +131,7 @@ var app = new Vue({
           user: app.currentUserData.userName
         },
         success: function (data) {
-          alert(data); //temporary to prevent errors
+          alert(data);
           app.currentUserData.userName = '';
           app.currentUserData.losses = 0;
           app.currentUserData.wins = 0;
