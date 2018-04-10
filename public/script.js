@@ -569,7 +569,7 @@ var app = new Vue({
       }
 
       // now check cross board win conditions
-      var board3d = [app.currentGameData.topBoard, app.currentGameData.middleBoard, app.currentGameData.bottomBoard];
+      //var board3d = [app.currentGameData.topBoard, app.currentGameData.middleBoard, app.currentGameData.bottomBoard];
 
       //check down through all boards
       winSt = '';
@@ -612,6 +612,97 @@ var app = new Vue({
           }
         }
         winSt = '';
+      }
+
+      //check diagonally sideways through all boards
+      winSt = '';
+      j = 0;
+      for (i = 0; i < 3; i++) {
+        winSt += app.currentGameData.topBoard[i][j];
+        winSt += app.currentGameData.middleBoard[i][j+1];
+        winSt += app.currentGameData.bottomBoard[i][j+2];
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+        winSt = '';
+      }
+
+      //check 4 remaining cross diagonals
+
+      //left to right starting at top
+      winSt = '';
+      winSt += app.currentGameData.topBoard[0][0];
+      winSt += app.currentGameData.middleBoard[1][1];
+      winSt += app.currentGameData.bottomBoard[2][2];
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      //right to left starting at top
+      winSt = '';
+      winSt += app.currentGameData.topBoard[0][2];
+      winSt += app.currentGameData.middleBoard[1][1];
+      winSt += app.currentGameData.bottomBoard[2][0];
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      //left to right starting at bottom
+      winSt = '';
+      winSt += app.currentGameData.topBoard[2][2];
+      winSt += app.currentGameData.middleBoard[1][1];
+      winSt += app.currentGameData.bottomBoard[0][0];
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
+      }
+
+      //right to left starting at bottom
+      winSt = '';
+      winSt += app.currentGameData.topBoard[2][0];
+      winSt += app.currentGameData.middleBoard[1][1];
+      winSt += app.currentGameData.bottomBoard[0][2];
+      if (winSt === 'XXX') {
+        return {
+          winnerExists: true,
+          winner: 1
+        }
+      } else if (winSt === 'OOO') {
+        return {
+          winnerExists: true,
+          winner: 2
+        }
       }
 
       return {
