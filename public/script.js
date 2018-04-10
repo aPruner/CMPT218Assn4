@@ -254,30 +254,30 @@ var app = new Vue({
           this.winnerCheck();
         }
         // run winnerCheck here?
-        console.log('topBoard');
-        console.log(app.currentGameData.topBoard);
-        console.log('middleBoard');
-        console.log(app.currentGameData.middleBoard);
-        console.log('bottomBoard');
-        console.log(app.currentGameData.bottomBoard);
       } else {
         alert('It\'s not your turn!');
       }
     },
     updateUI: function(data) {
-      console.log('inside updateUI');
+      console.log('inside updateUI', data.cell);
       // var cell = data.element.className.split(' ')[1].slice(4, 7);
       var cellY = parseInt(data.cell[0]);
       var cellZ = parseInt(data.cell[1]);
       var cellX = parseInt(data.cell[2]);
-      if (cellY === '0') {
+      if (cellY === 0) {
         app.currentGameData.topBoard[cellZ][cellX] = data.symbol;
-      } else if (cellY === '1') {
+      } else if (cellY === 1) {
         app.currentGameData.middleBoard[cellZ][cellX] = data.symbol;
       } else {
         app.currentGameData.bottomBoard[cellZ][cellX] = data.symbol;
       }
       $('.cell' + data.cell).html(data.symbol);
+      console.log('topBoard');
+      console.log(app.currentGameData.topBoard);
+      console.log('middleBoard');
+      console.log(app.currentGameData.middleBoard);
+      console.log('bottomBoard');
+      console.log(app.currentGameData.bottomBoard);
     },
     winnerCheck: function() {
       //need to check all boards individually, and all boards put together
