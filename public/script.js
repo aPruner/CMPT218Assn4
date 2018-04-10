@@ -222,105 +222,12 @@ var app = new Vue({
             room: data.room,
             winner: winnerObject.winner
           });
-          console.log('Good game! Stats will be recorded for this match');
-
-          var recordObject = {winner:'', loser:''};
-          var playerStatsObject = {userName:'', wins:0, losses:0};
-
-          if(data.winner === app.currentUserData.playerNumber) {
-            //current user won
-            playerStatsObject.userName = app.currentUserData.userName;
-            playerStatsObject.wins = 1;
-            playerStatsObject.losses = 0;
-
-            recordObject.winner = app.currentUserData.userName;
-            if(app.currentUserData.playerNumber === 1) {
-              recordObject.loser = app.currentGameData.p2UserName;
-            } else {
-              recordObject.loser = app.currentGameData.p1UserName;
-            }
-            console.log('winner: ', recordObject.winner);
-            console.log('loser: ', recordObject.loser);
-
-            app.saveGameStats(recordObject);
-            app.savePlayerStats(playerStatsObject);
-          } else {
-            //current user lost
-            playerStatsObject.userName = app.currentUserData.userName;
-            playerStatsObject.losses = 1;
-            playerStatsObject.wins = 0;
-            app.savePlayerStats(playerStatsObject);
-          }
-
-          app.page = 'home';
-          app.currentUserData.playerNumber = 0;
-          app.currentUserData.playerSymbol = '';
-          app.currentGameData = {
-            waitingForPlayer: false,
-            topBoard: [],
-            middleBoard: [],
-            bottomBoard: [],
-            p1UserName: '',
-            p2UserName: '',
-            playerTurn: 0,
-            playerWhoWon: 0,
-            roomId: '',
-            totalXonBoard: 0,
-            totalYonBoard: 0
-          };
+          app.goodGame(data.winner);
         }
       });
 
       socket.on('gameEnd', function(data) {
-        console.log('Good game! Stats will be recorded for this match');
-
-        var recordObject = {winner:'', loser:''};
-        var playerStatsObject = {userName:'', wins:0, losses:0};
-
-        if(data.winner === app.currentUserData.playerNumber) {
-          //current user won
-          playerStatsObject.userName = app.currentUserData.userName;
-          playerStatsObject.wins = 1;
-          playerStatsObject.losses = 0;
-
-          recordObject.winner = app.currentUserData.userName;
-          if(app.currentUserData.playerNumber === 1) {
-            recordObject.loser = app.currentGameData.p2UserName;
-          } else {
-            recordObject.loser = app.currentGameData.p1UserName;
-          }
-          console.log('winner: ', recordObject.winner);
-          console.log('loser: ', recordObject.loser);
-
-          app.saveGameStats(recordObject);
-          app.savePlayerStats(playerStatsObject);
-        } else {
-          //current user lost
-          playerStatsObject.userName = app.currentUserData.userName;
-          playerStatsObject.losses = 1;
-          playerStatsObject.wins = 0;
-          app.savePlayerStats(playerStatsObject);
-        }
-
-        socket.emit('leaveGame', {room: app.currentGameData.roomId});
-
-        app.page = 'home';
-        app.currentUserData.playerNumber = 0;
-        app.currentUserData.playerSymbol = '';
-        app.currentGameData = {
-          waitingForPlayer: false,
-          topBoard: [],
-          middleBoard: [],
-          bottomBoard: [],
-          p1UserName: '',
-          p2UserName: '',
-          playerTurn: 0,
-          playerWhoWon: 0,
-          roomId: '',
-          totalXonBoard: 0,
-          totalYonBoard: 0
-        };
-
+        app.goodGame(data.winner);
       });
 
       socket.on('err', function(data) {
@@ -696,15 +603,67 @@ var app = new Vue({
     },
     quitGame: function(){
       var winner = 0;
-      if(app.currentUserData.playerNumber === 1){
+      if(app.currentUserData.playerNumber === 1) {
         winner = 2;
-      }else{
+      } else {
         winner = 1;
       }
       socket.emit('gameEnded', {
         room: app.currentGameData.roomId,
         winner: winner
       });
+
+      app.goodGame(winner);
+    },
+    goodGame: function(winner){
+      console.log('Good game! Stats will be recorded for this match');
+
+      var recordObject = {winner:'', loser:''};
+      var playerStatsObject = {userName:'', wins:0, losses:0};
+
+      if(winner === app.currentUserData.playerNumber) {
+        //current user won
+        playerStatsObject.userName = app.currentUserData.userName;
+        playerStatsObject.wins = 1;
+        playerStatsObject.losses = 0;
+
+        recordObject.winner = app.currentUserData.userName;
+        if(app.currentUserData.playerNumber === 1) {
+          recordObject.loser = app.currentGameData.p2UserName;
+        } else {
+          recordObject.loser = app.currentGameData.p1UserName;
+        }
+        console.log('winner: ', recordObject.winner);
+        console.log('loser: ', recordObject.loser);
+
+        app.saveGameStats(recordObject);
+        app.savePlayerStats(playerStatsObject);
+      } else {
+        //current user lost
+        playerStatsObject.userName = app.currentUserData.userName;
+        playerStatsObject.losses = 1;
+        playerStatsObject.wins = 0;
+        app.savePlayerStats(playerStatsObject);
+      }
+
+      socket.emit('leaveGame', {room: app.currentGameData.roomId});
+
+      app.page = 'home';
+      app.currentUserData.playerNumber = 0;
+      app.currentUserData.playerSymbol = '';
+      app.currentGameData = {
+        waitingForPlayer: false,
+        topBoard: [],
+        middleBoard: [],
+        bottomBoard: [],
+        p1UserName: '',
+        p2UserName: '',
+        playerTurn: 0,
+        playerWhoWon: 0,
+        roomId: '',
+        totalXonBoard: 0,
+        totalYonBoard: 0
+      };
     }
   }
 });
