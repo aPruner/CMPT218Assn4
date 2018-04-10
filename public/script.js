@@ -571,6 +571,30 @@ var app = new Vue({
       // now check cross board win conditions
       var board3d = [app.currentGameData.topBoard, app.currentGameData.middleBoard, app.currentGameData.bottomBoard];
 
+      //check down through all boards
+      winSt = '';
+      for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++){
+          winSt += app.currentGameData.topBoard[i][j];
+          winSt += app.currentGameData.middleBoard[i][j];
+          winSt += app.currentGameData.bottomBoard[i][j];
+          if (winSt === 'XXX') {
+            return {
+              winnerExists: true,
+              winner: 1
+            }
+          } else if (winSt === 'OOO') {
+            return {
+              winnerExists: true,
+              winner: 2
+            }
+          }
+          winSt = '';
+        }
+      }
+
+      //check diagonally down through all boards
+
       return {
         winnerExists: false,
         winner: 0
