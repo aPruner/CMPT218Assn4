@@ -594,6 +594,25 @@ var app = new Vue({
       }
 
       //check diagonally down through all boards
+      winSt = '';
+      i = 0;
+      for (j = 0; j < 3; j++) {
+        winSt += app.currentGameData.topBoard[i][j];
+        winSt += app.currentGameData.middleBoard[i+1][j];
+        winSt += app.currentGameData.bottomBoard[i+2][j];
+        if (winSt === 'XXX') {
+          return {
+            winnerExists: true,
+            winner: 1
+          }
+        } else if (winSt === 'OOO') {
+          return {
+            winnerExists: true,
+            winner: 2
+          }
+        }
+        winSt = '';
+      }
 
       return {
         winnerExists: false,
