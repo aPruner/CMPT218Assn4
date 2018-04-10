@@ -242,11 +242,13 @@ io.on('connection', function(socket) {
     console.log('data is:', data);
     socket.emit('turnWasPlayed', {
       cell: data.cell,
-      room: data.room
+      symbol: data.symbol,
+      room: data.room,
     });
     socket.broadcast.to(data.room).emit('turnWasPlayed', {
       cell: data.cell,
-      room: data.room
+      symbol: data.symbol,
+      room: data.room,
     });
     console.log('turnWasPlayed event has been broadcasted to the room');
   });
