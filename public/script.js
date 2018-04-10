@@ -140,10 +140,9 @@ var app = new Vue({
       });
     },
     createNewGame: function() {
-      socket.emit('createGame', {name: app.currentUserData.userName});
+      socket.emit('createGame', {p1UserName: app.currentUserData.userName});
       console.log('lobby has been created, waiting for 2nd player...');
       this.setupSocketEventHandlers();
-
     },
     setupSocketEventHandlers: function() {
       socket.on('newGame', function(data) {
@@ -152,7 +151,6 @@ var app = new Vue({
         app.currentUserData.playerNumber = 1;
         app.currentGameData.waitingForPlayer = true;
         app.currentGameData.roomId = data.room;
-
       });
 
       socket.on('player1', function(data) {
@@ -166,6 +164,10 @@ var app = new Vue({
         app.currentGameData.topBoard = fillBoard();
         app.currentGameData.middleBoard = fillBoard();
         app.currentGameData.bottomBoard = fillBoard();
+        socket.emit('updateUserNames', {
+          p1UserName: app.currentGameData.p1UserName,
+          room: app.currentGameData.roomId
+        });
       });
 
       socket.on('player2', function(data) {
@@ -178,10 +180,19 @@ var app = new Vue({
         app.currentGameData.roomId = data.room;
         app.currentGameData.playerTurn = 1;
         app.currentGameData.p2UserName = app.currentUserData.userName;
+        app.updatePlayerUserNames(undefined, app.currentGameData.p2UserName);
         // initialize the game boards
         app.currentGameData.topBoard = fillBoard();
         app.currentGameData.middleBoard = fillBoard();
         app.currentGameData.bottomBoard = fillBoard();
+        socket.emit('updateUserNames', {
+          p2UserName: app.currentGameData.p2UserName,
+          room: app.currentGameData.roomId
+        });
+      });
+
+      socket.on('updateNames', function(data) {
+        app.updatePlayerUserNames(data.p1UserName, data.p2UserName);
       });
 
       socket.on('turnWasPlayed', function(data) {
@@ -271,7 +282,7 @@ var app = new Vue({
           } else {
             console.log('room received, it is:', roomId);
             socket.emit('joinGame', {
-              name: app.currentUserData.userName,
+              p2UserName: app.currentUserData.userName,
               room: roomId
             });
             console.log('joinGame event emitted to backend');
@@ -330,6 +341,16 @@ var app = new Vue({
       // console.log(app.currentGameData.middleBoard);
       // console.log('bottomBoard');
       // console.log(app.currentGameData.bottomBoard);
+    },
+    updatePlayerUserNames: function(p1UserName, p2UserName) {
+      if (p1UserName) {
+        app.currentGameData.p1UserName = p1UserName;
+      }
+      if (p2UserName) {
+        app.currentGameData.p2UserName = p2UserName;
+      }
+      console.log('player names have been updated in the game! They are: ');
+      console.log(app.currentGameData.p1UserName, app.currentGameData.p2UserName);
     },
     checkForWin: function() {
       // need to check all boards individually, and all boards put together
