@@ -223,6 +223,8 @@ io.on('connection', function(socket) {
     rooms++;
     var roomId = 'room-' + rooms;
     socket.join(roomId);
+    console.log('a new game has started, the room should only have player 1 in it');
+    console.log(io.nsps['/'].adapter.rooms[roomId]);
     socket.emit('newGame', {
       p1UserName: data.p1UserName,
       room: roomId
@@ -244,17 +246,17 @@ io.on('connection', function(socket) {
       });
       console.log('player1 and player 2 events emitted to frontend');
     } else {
-      socket.emit('err', {message: 'Sorry, The room is full!'});
+      socket.emit('err', {message: 'Sorry, either the room is full or it doesn\'t exist!'});
     }
   });
 
   socket.on('updateUserNames', function(data) {
     console.log('inside updateUserNames handler');
-    socket.emit('updateNames', {
-      p1UserName: data.p1UserName,
-      p2UserName: data.p2UserName,
-      room: data.room
-    });
+    // socket.emit('updateNames', {
+    //   p1UserName: data.p1UserName,
+    //   p2UserName: data.p2UserName,
+    //   room: data.room
+    // });
     socket.broadcast.to(data.room).emit('updateNames', {
       p1UserName: data.p1UserName,
       p2UserName: data.p2UserName,
@@ -265,11 +267,11 @@ io.on('connection', function(socket) {
   socket.on('playTurn', function(data) {
     console.log('inside playTurn handler');
     console.log('data is:', data);
-    socket.emit('turnWasPlayed', {
-      cell: data.cell,
-      symbol: data.symbol,
-      room: data.room
-    });
+    // socket.emit('turnWasPlayed', {
+    //   cell: data.cell,
+    //   symbol: data.symbol,
+    //   room: data.room
+    // });
     socket.broadcast.to(data.room).emit('turnWasPlayed', {
       cell: data.cell,
       symbol: data.symbol,
@@ -278,10 +280,22 @@ io.on('connection', function(socket) {
     console.log('turnWasPlayed event has been broadcasted to the room');
   });
 
-  socket.on('gameEnded', function(data) {
+  socket.on('leaveGame', function(data) {
+    console.log('the game has ended, second socket is about to leave');
+    console.log(io.nsps['/'].adapter.rooms[data.room]);
     socket.leave(data.room);
-    socket.emit('gameEnd', data);
+    console.log('the game has ended, last socket has left');
+    console.log(io.nsps['/'].adapter.rooms[data.room]);
+  });
+
+  socket.on('gameEnded', function(data) {
+    // socket.emit('gameEnd', data);
+    console.log('the game has ended, first socket is about to leave');
+    console.log(io.nsps['/'].adapter.rooms[data.room]);
     socket.broadcast.to(data.room).emit('gameEnd', data);
+    socket.leave(data.room);
+    console.log('the game has ended, first socket has left');
+    console.log(io.nsps['/'].adapter.rooms[data.room]);
   });
 });
 

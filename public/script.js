@@ -147,6 +147,7 @@ var app = new Vue({
     setupSocketEventHandlers: function() {
       socket.on('newGame', function(data) {
         console.log('inside newGame handler, setting up the game');
+        console.log('this is printing twice upon starting another game after the first');
         app.currentUserData.playerSymbol = 'X';
         app.currentUserData.playerNumber = 1;
         app.currentGameData.waitingForPlayer = true;
@@ -168,6 +169,7 @@ var app = new Vue({
           p1UserName: app.currentGameData.p1UserName,
           room: app.currentGameData.roomId
         });
+        console.log(app.currentGameData);
       });
 
       socket.on('player2', function(data) {
@@ -180,7 +182,6 @@ var app = new Vue({
         app.currentGameData.roomId = data.room;
         app.currentGameData.playerTurn = 1;
         app.currentGameData.p2UserName = app.currentUserData.userName;
-        app.updatePlayerUserNames(undefined, app.currentGameData.p2UserName);
         // initialize the game boards
         app.currentGameData.topBoard = fillBoard();
         app.currentGameData.middleBoard = fillBoard();
@@ -189,10 +190,13 @@ var app = new Vue({
           p2UserName: app.currentGameData.p2UserName,
           room: app.currentGameData.roomId
         });
+        console.log(app.currentGameData);
       });
 
       socket.on('updateNames', function(data) {
         app.updatePlayerUserNames(data.p1UserName, data.p2UserName);
+        console.log('player names have been updated in the game! They are: ');
+        console.log(app.currentGameData.p1UserName, app.currentGameData.p2UserName);
       });
 
       socket.on('turnWasPlayed', function(data) {
@@ -211,30 +215,78 @@ var app = new Vue({
           winnerObject = app.checkForWin();
         }
         if (!winnerObject.winnerExists) {
-          console.log('Now, it will be player' + parseInt(app.currentGameData.playerTurn) + '\'s turn');
+          console.log('Now it will be player' + parseInt(app.currentGameData.playerTurn) + '\'s turn');
         } else {
           console.log('The game has ended, and player ' + parseInt(winnerObject.winner) + ' has won the game!');
           socket.emit('gameEnded', {
             room: data.room,
             winner: winnerObject.winner
           });
+          console.log('Good game! Stats will be recorded for this match');
+
+          var recordObject = {winner:'', loser:''};
+          var playerStatsObject = {userName:'', wins:0, losses:0};
+
+          if(data.winner === app.currentUserData.playerNumber) {
+            //current user won
+            playerStatsObject.userName = app.currentUserData.userName;
+            playerStatsObject.wins = 1;
+            playerStatsObject.losses = 0;
+
+            recordObject.winner = app.currentUserData.userName;
+            if(app.currentUserData.playerNumber === 1) {
+              recordObject.loser = app.currentGameData.p2UserName;
+            } else {
+              recordObject.loser = app.currentGameData.p1UserName;
+            }
+            console.log('winner: ', recordObject.winner);
+            console.log('loser: ', recordObject.loser);
+
+            app.saveGameStats(recordObject);
+            app.savePlayerStats(playerStatsObject);
+          } else {
+            //current user lost
+            playerStatsObject.userName = app.currentUserData.userName;
+            playerStatsObject.losses = 1;
+            playerStatsObject.wins = 0;
+            app.savePlayerStats(playerStatsObject);
+          }
+
+          app.page = 'home';
+          app.currentUserData.playerNumber = 0;
+          app.currentUserData.playerSymbol = '';
+          app.currentGameData = {
+            waitingForPlayer: false,
+            topBoard: [],
+            middleBoard: [],
+            bottomBoard: [],
+            p1UserName: '',
+            p2UserName: '',
+            playerTurn: 0,
+            playerWhoWon: 0,
+            roomId: '',
+            totalXonBoard: 0,
+            totalYonBoard: 0
+          };
         }
       });
+
       socket.on('gameEnd', function(data) {
         console.log('Good game! Stats will be recorded for this match');
 
         var recordObject = {winner:'', loser:''};
         var playerStatsObject = {userName:'', wins:0, losses:0};
 
-        if(data.winner === app.currentUserData.playerNumber){ //current user won
+        if(data.winner === app.currentUserData.playerNumber) {
+          //current user won
           playerStatsObject.userName = app.currentUserData.userName;
           playerStatsObject.wins = 1;
           playerStatsObject.losses = 0;
 
           recordObject.winner = app.currentUserData.userName;
-          if(app.currentUserData.playerNumber === 1){
+          if(app.currentUserData.playerNumber === 1) {
             recordObject.loser = app.currentGameData.p2UserName;
-          }else{
+          } else {
             recordObject.loser = app.currentGameData.p1UserName;
           }
           console.log('winner: ', recordObject.winner);
@@ -242,12 +294,15 @@ var app = new Vue({
 
           app.saveGameStats(recordObject);
           app.savePlayerStats(playerStatsObject);
-        }else{ //current user lost
+        } else {
+          //current user lost
           playerStatsObject.userName = app.currentUserData.userName;
           playerStatsObject.losses = 1;
           playerStatsObject.wins = 0;
           app.savePlayerStats(playerStatsObject);
         }
+
+        socket.emit('leaveGame', {room: app.currentGameData.roomId});
 
         app.page = 'home';
         app.currentUserData.playerNumber = 0;
@@ -265,6 +320,7 @@ var app = new Vue({
           totalXonBoard: 0,
           totalYonBoard: 0
         };
+
       });
 
       socket.on('err', function(data) {
@@ -272,7 +328,6 @@ var app = new Vue({
       });
     },
     joinGame: function() {
-      console.log('inside joinGame');
       $.ajax({
         method: 'get',
         url: '/rooms',
@@ -297,20 +352,33 @@ var app = new Vue({
       if (app.currentGameData.playerTurn === app.currentUserData.playerNumber) {
         if (event && event.target) {
           var cell = event.target.className.split(' ')[1].slice(4, 7);
+          var cellY = parseInt(cell[0]);
           var cellZ = parseInt(cell[1]);
           var cellX = parseInt(cell[2]);
 
-          if (app.currentGameData.topBoard[cellZ][cellX] !== '' || app.currentGameData.middleBoard[cellZ][cellX] !== '' || app.currentGameData.bottomBoard[cellZ][cellX] !== '') {
+          if (cellY === 0 && app.currentGameData.topBoard[cellZ][cellX] !== '') {
+            alert('This cell has already been filled!');
+            return;
+          } else if (cellY === 1 && app.currentGameData.middleBoard[cellZ][cellX] !== '') {
+            alert('This cell has already been filled!');
+            return;
+          } else if (cellY === 2 && app.currentGameData.bottomBoard[cellZ][cellX] !== '') {
             alert('This cell has already been filled!');
             return;
           }
 
-          console.log(event);
-          socket.emit('playTurn', {
+          var data = {
             cell: cell,
             symbol: app.currentUserData.playerSymbol,
             room: app.currentGameData.roomId
-          });
+          };
+          if (app.currentGameData.playerTurn === 1) {
+            app.currentGameData.playerTurn = 2;
+          } else {
+            app.currentGameData.playerTurn = 1;
+          }
+          this.updateUI(data);
+          socket.emit('playTurn', data);
         }
       } else {
         alert('It\'s not your turn!');
@@ -335,12 +403,12 @@ var app = new Vue({
         app.currentGameData.totalYonBoard++;
       }
       $('.cell' + data.cell).html(data.symbol);
-      // console.log('topBoard');
-      // console.log(app.currentGameData.topBoard);
-      // console.log('middleBoard');
-      // console.log(app.currentGameData.middleBoard);
-      // console.log('bottomBoard');
-      // console.log(app.currentGameData.bottomBoard);
+      console.log('topBoard');
+      console.log(app.currentGameData.topBoard);
+      console.log('middleBoard');
+      console.log(app.currentGameData.middleBoard);
+      console.log('bottomBoard');
+      console.log(app.currentGameData.bottomBoard);
     },
     updatePlayerUserNames: function(p1UserName, p2UserName) {
       if (p1UserName) {
@@ -349,8 +417,6 @@ var app = new Vue({
       if (p2UserName) {
         app.currentGameData.p2UserName = p2UserName;
       }
-      console.log('player names have been updated in the game! They are: ');
-      console.log(app.currentGameData.p1UserName, app.currentGameData.p2UserName);
     },
     checkForWin: function() {
       // need to check all boards individually, and all boards put together
