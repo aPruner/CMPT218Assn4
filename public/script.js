@@ -596,7 +596,6 @@ var app = new Vue({
     },
     saveGameStats: function(data) {
       console.log('entered saveGameStats');
-      console.log('data: ', data);
       $.ajax({
         method: 'post',
         url: '/storeGameData',
@@ -612,7 +611,6 @@ var app = new Vue({
     savePlayerStats: function(data) {
       //send over record object with 1 and 0 for win/loss columns
       console.log('entered savePlayerStats');
-      console.log('data: ', data);
       $.ajax({
         method: 'post',
         url: '/savePlayerStats',

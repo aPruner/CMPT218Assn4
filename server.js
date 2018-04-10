@@ -282,7 +282,7 @@ io.on('connection', function(socket) {
       symbol: data.symbol,
       room: data.room
     });
-    console.log('turnWasPlayed event has been broadcasted to the room');
+    console.log('turnWasPlayed event has been broadcast to the room');
   });
 
   socket.on('gameEnded', function(data) {
